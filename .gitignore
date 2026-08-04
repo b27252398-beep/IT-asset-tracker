@@ -1,0 +1,9 @@
+node_modules/
+dist/
+target/
+.env
+*.zip
+tmp-zip/
+.DS_Store
+.idea/
+.vscode/
