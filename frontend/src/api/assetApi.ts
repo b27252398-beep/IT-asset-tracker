@@ -6,6 +6,7 @@
 // ============================================================
 
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
@@ -13,6 +14,15 @@ const api = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
   timeout: 10_000,
+});
+
+// --- Request interceptor: attach token ---
+api.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // --- Response interceptor: normalise error messages ---
@@ -33,7 +43,7 @@ api.interceptors.response.use(
 /** Returns { TOTAL, AVAILABLE, ASSIGNED, IN_REPAIR, RETIRED } */
 export async function fetchDashboardMetrics() {
   const { data } = await api.get('/assets/dashboard');
-  return data;
+  return data.data;
 }
 
 // ---- Assets ----
@@ -42,13 +52,13 @@ export async function fetchDashboardMetrics() {
 export async function fetchAssets(status = '') {
   const params = status ? { status } : {};
   const { data } = await api.get('/assets', { params });
-  return data;
+  return data.data;
 }
 
 /** Returns a single asset by UUID. */
 export async function fetchAssetById(id) {
   const { data } = await api.get(`/assets/${id}`);
-  return data;
+  return data.data;
 }
 
 /**

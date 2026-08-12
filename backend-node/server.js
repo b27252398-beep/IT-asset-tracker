@@ -6,6 +6,34 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Fake secret for mock JWT
+const MOCK_TOKEN = "mock-jwt-token-123";
+
+// Authentication Middleware
+const authMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+  next();
+};
+
+// --- AUTH ENDPOINTS ---
+app.post('/api/auth/login', (req, res) => {
+  const { username, password } = req.body;
+  if (username && password) {
+    return res.json({ 
+      success: true, 
+      message: "Login successful", 
+      data: { token: MOCK_TOKEN, user: { name: username, role: "ADMIN" } } 
+    });
+  }
+  return res.status(401).json({ success: false, message: "Invalid credentials" });
+});
+
+// Protect all /api/assets routes
+app.use('/api/assets', authMiddleware);
+
 // In-memory data stores
 let assets = [
   {
@@ -58,24 +86,28 @@ function addLog(assetId, action, assignedTo, performedBy, notes) {
   });
 }
 
+const employees = [
+  { id: "e1", name: "John Doe", email: "john@example.com", department: "Engineering", role: "Software Engineer", status: "Active" },
+  { id: "e2", name: "Jane Smith", email: "jane@example.com", department: "Design", role: "Product Designer", status: "Active" },
+  { id: "e3", name: "Mike Johnson", email: "mike@example.com", department: "HR", role: "HR Manager", status: "Active" },
+  { id: "e4", name: "Sarah Williams", email: "sarah@example.com", department: "Engineering", role: "DevOps Engineer", status: "On Leave" },
+];
+
 // 1. GET /api/assets/dashboard
 app.get('/api/assets/dashboard', (req, res) => {
   const metrics = {
-    AVAILABLE: 0,
-    ASSIGNED: 0,
-    IN_REPAIR: 0,
-    RETIRED: 0,
-    TOTAL: 0
+    AVAILABLE: assets.filter(a => a.status === 'AVAILABLE').length,
+    ASSIGNED: assets.filter(a => a.status === 'ASSIGNED').length,
+    IN_REPAIR: assets.filter(a => a.status === 'IN_REPAIR').length,
+    RETIRED: assets.filter(a => a.status === 'RETIRED').length
   };
+  metrics.TOTAL = metrics.AVAILABLE + metrics.ASSIGNED + metrics.IN_REPAIR + metrics.RETIRED;
+  res.json({ success: true, message: "Metrics retrieved successfully", data: metrics });
+});
 
-  assets.forEach(a => {
-    if (metrics[a.status] !== undefined) {
-      metrics[a.status]++;
-    }
-  });
-
-  metrics.TOTAL = metrics.AVAILABLE + metrics.ASSIGNED + metrics.IN_REPAIR;
-  res.json(metrics);
+// GET /api/employees
+app.get('/api/employees', (req, res) => {
+  res.json({ success: true, message: "Employees retrieved successfully", data: employees });
 });
 
 // 2. GET /api/assets
@@ -83,9 +115,9 @@ app.get('/api/assets', (req, res) => {
   const { status } = req.query;
   if (status) {
     const filtered = assets.filter(a => a.status === status.toUpperCase());
-    return res.json(filtered);
+    return res.json({ success: true, message: "Assets retrieved successfully", data: filtered });
   }
-  res.json(assets);
+  res.json({ success: true, message: "Assets retrieved successfully", data: assets });
 });
 
 // 3. GET /api/assets/:id

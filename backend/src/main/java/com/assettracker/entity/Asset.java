@@ -1,4 +1,4 @@
-package com.assettracker.model;
+package com.assettracker.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -6,12 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.UUID;
 
 /**
  * Represents a physical or logical IT asset in the organisation's inventory.
@@ -22,7 +18,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Asset {
+public class Asset extends BaseEntity {
 
     // --- Enums (must match PostgreSQL ENUM types exactly) ---
 
@@ -37,11 +33,6 @@ public class Asset {
     }
 
     // --- Fields ---
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
-    private UUID id;
 
     /** Human-readable asset tag, e.g. "ASSET-001". Must be unique. */
     @NotBlank(message = "Asset tag is required")
@@ -77,12 +68,4 @@ public class Asset {
 
     @Column(columnDefinition = "TEXT")
     private String notes;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
 }

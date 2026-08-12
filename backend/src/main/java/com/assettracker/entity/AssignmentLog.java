@@ -1,4 +1,4 @@
-package com.assettracker.model;
+package com.assettracker.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -6,10 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.OffsetDateTime;
-import java.util.UUID;
 
 /**
  * Immutable audit record for every assignment or status change on an asset.
@@ -21,12 +17,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AssignmentLog {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
-    private UUID id;
+public class AssignmentLog extends BaseEntity {
 
     /**
      * Foreign key to the asset this log entry belongs to.
@@ -55,10 +46,6 @@ public class AssignmentLog {
 
     @Column(columnDefinition = "TEXT")
     private String notes;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
 
     // --- Convenience constructor used by the service layer ---
     public AssignmentLog(Asset asset, String action, String assignedTo,
