@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchDashboardMetrics, fetchAssets, fetchWarrantyAlerts } from "../api/assetApi";
+import { fetchDashboardMetrics, fetchAssets, fetchWarrantyAlerts, downloadAssetsCSV } from "../api/assetApi";
 import { Monitor, CheckCircle, Wrench, XCircle, ArrowUpRight, ShieldCheck, Laptop2, Server, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { 
@@ -71,7 +71,7 @@ export default function Dashboard() {
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
           <button 
-            onClick={() => console.log("Report generation triggered! (Mock)")}
+            onClick={downloadAssetsCSV}
             className="flex-1 sm:flex-none bg-white text-slate-700 px-4 py-2 rounded-lg border border-slate-200 font-medium hover:bg-slate-50 focus:ring-4 focus:ring-slate-100 transition-colors shadow-sm cursor-pointer"
           >
             Download Report

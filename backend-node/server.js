@@ -225,6 +225,60 @@ app.get('/api/assets/dashboard', async (req, res) => {
   }
 });
 
+// ==========================================
+// EXPORTING ENGINE MODULE
+// ==========================================
+
+// GET /api/reports/assets/csv
+app.get('/api/reports/assets/csv', async (req, res) => {
+  try {
+    const assets = await prisma.asset.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+
+    if (assets.length === 0) {
+      return res.status(404).send('No assets found');
+    }
+
+    // Define CSV Headers
+    const headers = ['ID,Asset_Tag,Name,Category,Status,Location,Warranty_Expiry,Created_At\n'];
+    
+    // Map data to CSV rows
+    const rows = assets.map(a => {
+      // Escape commas and quotes for CSV format
+      const escapeCSV = (str) => {
+        if (!str) return '""';
+        const stringified = String(str);
+        if (stringified.includes(',') || stringified.includes('"') || stringified.includes('\n')) {
+          return `"${stringified.replace(/"/g, '""')}"`;
+        }
+        return stringified;
+      };
+
+      return [
+        escapeCSV(a.id),
+        escapeCSV(a.assetTag),
+        escapeCSV(a.name),
+        escapeCSV(a.category),
+        escapeCSV(a.status),
+        escapeCSV(a.location),
+        escapeCSV(a.warrantyExpiry ? new Date(a.warrantyExpiry).toISOString().split('T')[0] : 'N/A'),
+        escapeCSV(new Date(a.createdAt).toISOString())
+      ].join(',');
+    });
+
+    const csvContent = headers.concat(rows).join('\n');
+
+    // Set headers to trigger file download in browser
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="IT_Assets_Inventory_Report.csv"');
+    
+    res.status(200).send(csvContent);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // GET /api/employees
 app.get('/api/employees', async (req, res) => {
   const employees = await prisma.employee.findMany();

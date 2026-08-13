@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { fetchAssets, createAsset, updateAsset, checkOutAsset, checkInAsset, fetchAssetLogs, fetchMaintenanceLogs, createMaintenanceRecord, updateMaintenanceRecord } from "../api/assetApi";
+import { fetchAssets, createAsset, updateAsset, checkOutAsset, checkInAsset, fetchAssetLogs, fetchMaintenanceLogs, createMaintenanceRecord, updateMaintenanceRecord, downloadAssetsCSV } from "../api/assetApi";
 import { fetchEmployees } from "../api/employeeApi";
 import { useAuthStore } from "../store/authStore";
 import { QRCodeSVG } from "qrcode.react";
-import { Plus, Search, Filter, Monitor, Laptop, Smartphone, Server, X, Printer } from "lucide-react";
+import { Plus, Search, Filter, Monitor, Laptop, Smartphone, Server, X, Printer, Download } from "lucide-react";
 
 export default function Assets() {
   const { userRole } = useAuthStore();
@@ -188,15 +188,24 @@ export default function Assets() {
           <h1 className="text-2xl font-bold text-slate-900">Asset Inventory</h1>
           <p className="text-slate-500 text-sm mt-1">Manage and track all hardware assets across the organization.</p>
         </div>
-        {userRole === 'ADMIN' && (
+        <div className="flex items-center space-x-3">
           <button 
-            onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 transition-colors cursor-pointer"
+            onClick={downloadAssetsCSV}
+            className="inline-flex items-center justify-center px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 focus:ring-4 focus:ring-slate-100 transition-colors shadow-sm cursor-pointer"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Asset
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
           </button>
-        )}
+          {userRole === 'ADMIN' && (
+            <button 
+              onClick={() => setIsAddModalOpen(true)}
+              className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 transition-colors cursor-pointer"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Asset
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">

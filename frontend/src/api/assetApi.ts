@@ -143,3 +143,22 @@ export async function updateMaintenanceRecord(maintenanceId, payload) {
   const { data } = await api.put(`/maintenance/${maintenanceId}`, payload);
   return data;
 }
+
+/** Downloads the CSV report of all assets */
+export async function downloadAssetsCSV() {
+  const response = await api.get('/reports/assets/csv', {
+    responseType: 'blob', // Important for downloading files
+  });
+  
+  // Create a link to download the blob
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'IT_Assets_Inventory_Report.csv');
+  document.body.appendChild(link);
+  link.click();
+  
+  // Clean up
+  link.parentNode.removeChild(link);
+  window.URL.revokeObjectURL(url);
+}
