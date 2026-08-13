@@ -828,6 +828,41 @@ app.delete('/api/approvals/:id', async (req, res) => {
   }
 });
 
+// ==========================================
+// AUDIT LOGS MODULE
+// ==========================================
+
+// GET /api/audit-logs
+app.get('/api/audit-logs', async (req, res) => {
+  try {
+    const logs = await prisma.auditLog.findMany({
+      orderBy: { timestamp: 'desc' }
+    });
+    res.json({ success: true, data: logs });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// POST /api/audit-logs
+app.post('/api/audit-logs', async (req, res) => {
+  try {
+    const { action, entityType, entityId, userName, details } = req.body;
+    const newLog = await prisma.auditLog.create({
+      data: {
+        action,
+        entityType,
+        entityId,
+        userName,
+        details
+      }
+    });
+    res.status(201).json(newLog);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // Edit general asset details
 app.put('/api/assets/:id/edit', async (req, res) => {
   const { name, assetTag, category, location, status, warrantyExpiry } = req.body;

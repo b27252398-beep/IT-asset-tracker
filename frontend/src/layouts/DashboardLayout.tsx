@@ -1,6 +1,6 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Laptop2, Users, Settings, LogOut, Bell, Key, Building2, Package, ShoppingCart, MapPin, Calendar, CheckSquare } from "lucide-react";
+import { LayoutDashboard, Laptop2, Users, Settings, LogOut, Bell, Key, Building2, Package, ShoppingCart, MapPin, Calendar, CheckSquare, Activity } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 
 interface DashboardLayoutProps {
@@ -22,6 +22,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: "Facilities", href: "/locations", icon: MapPin },
     { name: "Schedules", href: "/schedules", icon: Calendar },
     { name: "Approvals", href: "/approvals", icon: CheckSquare },
+    { name: "Audit Logs", href: "/audit-logs", icon: Activity },
     { name: "Employees", href: "/employees", icon: Users },
     { name: "Settings", href: "/settings", icon: Settings },
   ];

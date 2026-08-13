@@ -13,6 +13,7 @@ import PurchaseOrdersPage from "./pages/PurchaseOrders";
 import LocationsPage from "./pages/Locations";
 import MaintenanceSchedulesPage from "./pages/MaintenanceSchedules";
 import ApprovalsPage from "./pages/Approvals";
+import AuditLogsPage from "./pages/AuditLogs";
 import { useAuthStore } from "./store/authStore";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -39,6 +40,7 @@ function App() {
         <Route path="/locations" element={<ProtectedRoute><LocationsPage /></ProtectedRoute>} />
         <Route path="/schedules" element={<ProtectedRoute><MaintenanceSchedulesPage /></ProtectedRoute>} />
         <Route path="/approvals" element={<ProtectedRoute><ApprovalsPage /></ProtectedRoute>} />
+        <Route path="/audit-logs" element={<ProtectedRoute><AuditLogsPage /></ProtectedRoute>} />
         <Route path="/employees" element={<ProtectedRoute><EmployeesPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
       </Routes>
