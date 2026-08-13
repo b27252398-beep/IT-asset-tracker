@@ -1,27 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchDashboardMetrics, fetchAssets } from "../api/assetApi";
-import { Monitor, CheckCircle, Wrench, XCircle, ArrowUpRight, ShieldCheck, Laptop2, Server } from "lucide-react";
+import { fetchDashboardMetrics, fetchAssets, fetchWarrantyAlerts } from "../api/assetApi";
+import { Monitor, CheckCircle, Wrench, XCircle, ArrowUpRight, ShieldCheck, Laptop2, Server, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell
 } from "recharts";
 
-// Mock data for charts until backend Analytics module is built
-const activityData = [
-  { name: 'Mon', assignments: 4, returns: 2 },
-  { name: 'Tue', assignments: 7, returns: 1 },
-  { name: 'Wed', assignments: 3, returns: 5 },
-  { name: 'Thu', assignments: 8, returns: 3 },
-  { name: 'Fri', assignments: 5, returns: 4 },
-];
-
-const categoryData = [
-  { name: 'Laptops', value: 45, color: '#4f46e5' },
-  { name: 'Desktops', value: 20, color: '#06b6d4' },
-  { name: 'Monitors', value: 35, color: '#8b5cf6' },
-  { name: 'Servers', value: 10, color: '#f59e0b' },
-];
+// Charts data will be driven directly from the backend via fetchDashboardMetrics
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -47,7 +33,12 @@ export default function Dashboard() {
     queryFn: () => fetchAssets(),
   });
 
-  if (isMetricsLoading || isAssetsLoading) {
+  const { data: alerts, isLoading: isAlertsLoading } = useQuery({
+    queryKey: ["warrantyAlerts"],
+    queryFn: fetchWarrantyAlerts,
+  });
+
+  if (isMetricsLoading || isAssetsLoading || isAlertsLoading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
@@ -62,6 +53,9 @@ export default function Dashboard() {
     { title: "Retired", value: metrics?.RETIRED || 0, icon: XCircle, color: "text-rose-600", bg: "bg-rose-50" },
   ];
 
+  const activityData = metrics?.activityData || [];
+  const categoryData = metrics?.categoryData || [];
+
   return (
     <motion.div 
       className="space-y-6 pb-12"
@@ -70,16 +64,22 @@ export default function Dashboard() {
       animate="visible"
     >
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Overview</h2>
+          <h1 className="text-2xl font-bold text-slate-900">Overview</h1>
           <p className="text-slate-500 text-sm mt-1">Real-time metrics and asset utilization across your organization.</p>
         </div>
-        <div className="flex space-x-3">
-          <button className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm">
+        <div className="flex gap-3 w-full sm:w-auto">
+          <button 
+            onClick={() => console.log("Report generation triggered! (Mock)")}
+            className="flex-1 sm:flex-none bg-white text-slate-700 px-4 py-2 rounded-lg border border-slate-200 font-medium hover:bg-slate-50 focus:ring-4 focus:ring-slate-100 transition-colors shadow-sm cursor-pointer"
+          >
             Download Report
           </button>
-          <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200 flex items-center">
+          <button 
+            onClick={() => console.log("Redirecting to provisioning flow... (Mock)")}
+            className="flex-1 sm:flex-none flex items-center justify-center bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 transition-colors shadow-sm cursor-pointer"
+          >
             <Monitor className="w-4 h-4 mr-2" />
             Provision Asset
           </button>
@@ -128,29 +128,33 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={activityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorAssignments" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorReturns" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }}
-                />
-                <Area type="monotone" dataKey="assignments" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorAssignments)" />
-                <Area type="monotone" dataKey="returns" stroke="#06b6d4" strokeWidth={3} fillOpacity={1} fill="url(#colorReturns)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            {activityData.length === 0 ? (
+              <div className="h-full flex items-center justify-center text-slate-400 italic">No activity data available</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={activityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorAssignments" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorReturns" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} allowDecimals={false} />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }}
+                  />
+                  <Area type="monotone" dataKey="assignments" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorAssignments)" />
+                  <Area type="monotone" dataKey="returns" stroke="#06b6d4" strokeWidth={3} fillOpacity={1} fill="url(#colorReturns)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </motion.div>
 
@@ -161,32 +165,82 @@ export default function Dashboard() {
             <p className="text-slate-500 text-sm">Assets by category</p>
           </div>
           <div className="flex-1 min-h-[200px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categoryData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" hide />
-                <Tooltip 
-                  cursor={{fill: '#f8fafc'}} 
-                  contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24}>
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {categoryData.length === 0 ? (
+               <div className="h-full flex items-center justify-center text-slate-400 italic mt-8">No assets in inventory</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" hide />
+                  <Tooltip 
+                    cursor={{fill: '#f8fafc'}} 
+                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                  />
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24}>
+                    {categoryData.map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-4 mt-6">
-            {categoryData.map(cat => (
+            {categoryData.map((cat: any) => (
               <div key={cat.name} className="flex items-center">
                 <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: cat.color }}></div>
-                <span className="text-sm text-slate-600">{cat.name}</span>
+                <span className="text-sm text-slate-600">{cat.name} ({cat.value})</span>
               </div>
             ))}
           </div>
         </motion.div>
       </div>
+
+      {/* Warranty Alerts Section */}
+      <motion.div variants={itemVariants} className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-amber-100 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-amber-600" />
+            </div>
+            <h2 className="text-lg font-semibold text-slate-800">Warranty Alerts</h2>
+          </div>
+          <span className="text-sm font-medium text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
+            {alerts.expiringSoon.length + alerts.expired.length} Alerts
+          </span>
+        </div>
+
+        <div className="space-y-4">
+          {alerts.expired.length === 0 && alerts.expiringSoon.length === 0 ? (
+            <div className="text-center py-8 text-slate-500 italic">No warranty alerts at this time.</div>
+          ) : (
+            <>
+              {alerts.expired.map((asset: any) => (
+                <div key={asset.id} className="flex items-center justify-between p-4 rounded-xl border border-red-100 bg-red-50/30">
+                  <div>
+                    <h4 className="font-semibold text-slate-800">{asset.name} <span className="text-xs text-slate-500 font-normal ml-2">({asset.assetTag})</span></h4>
+                    <p className="text-sm text-red-600 mt-1">Warranty expired on {new Date(asset.warrantyExpiry).toLocaleDateString()}</p>
+                  </div>
+                  <button className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">View Asset</button>
+                </div>
+              ))}
+              
+              {alerts.expiringSoon.map((asset: any) => {
+                const daysLeft = Math.ceil((new Date(asset.warrantyExpiry).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
+                return (
+                  <div key={asset.id} className="flex items-center justify-between p-4 rounded-xl border border-amber-100 bg-amber-50/30">
+                    <div>
+                      <h4 className="font-semibold text-slate-800">{asset.name} <span className="text-xs text-slate-500 font-normal ml-2">({asset.assetTag})</span></h4>
+                      <p className="text-sm text-amber-600 mt-1">Expires in {daysLeft} days ({new Date(asset.warrantyExpiry).toLocaleDateString()})</p>
+                    </div>
+                    <button className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">View Asset</button>
+                  </div>
+                );
+              })}
+            </>
+          )}
+        </div>
+      </motion.div>
 
       {/* Recent Assets Table */}
       <motion.div variants={itemVariants} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">

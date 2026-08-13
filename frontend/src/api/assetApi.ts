@@ -46,6 +46,12 @@ export async function fetchDashboardMetrics() {
   return data.data;
 }
 
+/** Returns warranty alerts */
+export async function fetchWarrantyAlerts() {
+  const { data } = await api.get('/assets/warranty-alerts');
+  return data.data;
+}
+
 // ---- Assets ----
 
 /** Returns full asset list. Pass status string to filter. */
@@ -71,13 +77,34 @@ export async function createAsset(payload) {
 }
 
 /**
- * Assigns an available asset to a user.
+ * Updates an asset's details.
  * @param {string} id - Asset UUID
- * @param {string} assignedTo - User name
+ * @param {Object} payload - { name, assetTag, category, location, status }
+ */
+export async function updateAsset(id, payload) {
+  const { data } = await api.put(`/assets/${id}/edit`, payload);
+  return data;
+}
+
+/**
+ * Checks out an available asset to an employee.
+ * @param {string} id - Asset UUID
+ * @param {string} employeeId - Employee UUID
  * @param {string} [performedBy] - Admin performing the action
  */
-export async function assignAsset(id, assignedTo, performedBy = 'Admin') {
-  const { data } = await api.put(`/assets/${id}/assign`, { assignedTo, performedBy });
+export async function checkOutAsset(id, employeeId, performedBy = 'Admin') {
+  const { data } = await api.put(`/assets/${id}/assign`, { employeeId, performedBy });
+  return data;
+}
+
+/**
+ * Checks in an assigned asset from an employee.
+ * @param {string} id - Asset UUID
+ * @param {string} [notes] - Optional notes
+ * @param {string} [performedBy] - Admin performing the action
+ */
+export async function checkInAsset(id, notes = '', performedBy = 'Admin') {
+  const { data } = await api.put(`/assets/${id}/checkin`, { notes, performedBy });
   return data;
 }
 
@@ -96,5 +123,23 @@ export async function updateAssetStatus(id, status, notes = '', performedBy = 'A
 /** Returns assignment history for one asset, newest first. */
 export async function fetchAssetLogs(id) {
   const { data } = await api.get(`/assets/${id}/logs`);
+  return data;
+}
+
+/** Returns maintenance history for one asset */
+export async function fetchMaintenanceLogs(id) {
+  const { data } = await api.get(`/assets/${id}/maintenance`);
+  return data.data;
+}
+
+/** Logs a new maintenance record */
+export async function createMaintenanceRecord(id, payload) {
+  const { data } = await api.post(`/assets/${id}/maintenance`, payload);
+  return data;
+}
+
+/** Updates a maintenance record */
+export async function updateMaintenanceRecord(maintenanceId, payload) {
+  const { data } = await api.put(`/maintenance/${maintenanceId}`, payload);
   return data;
 }

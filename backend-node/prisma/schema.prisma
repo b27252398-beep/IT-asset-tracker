@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  department String
+  role       String   // e.g. "Software Engineer"
+  status     String   @default("Active") // Active, On Leave, Terminated
+  
+  // For RBAC
+  systemRole String   @default("EMPLOYEE") // EMPLOYEE, IT_SUPPORT, SUPER_ADMIN
+  
+  // Relations
+  assignedAssets Asset[] @relation("AssignedAssets")
+}
+
+model Asset {
+  id           String   @id @default(uuid())
+  assetTag     String   @unique
+  serialNumber String?
+  name         String
+  category     String
+  status       String   @default("AVAILABLE") // AVAILABLE, ASSIGNED, IN_REPAIR, RETIRED
+  location     String?
+  warrantyExpiry DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  employeeId   String?
+  employee     Employee? @relation("AssignedAssets", fields: [employeeId], references: [id])
+  logs         AuditLog[]
+  maintenance  Maintenance[]
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String   // CREATE, EDIT, STATUS_CHANGE, ASSIGN, UNASSIGN
+  performedBy String
+  details     String?
+  timestamp   DateTime @default(now())
+  
+  // Relations
+  assetId     String
+  asset       Asset    @relation(fields: [assetId], references: [id])
+}
+
+model Maintenance {
+  id               String   @id @default(uuid())
+  issueDescription String
+  cost             Float?
+  status           String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // Relations
+  assetId          String
+  asset            Asset    @relation(fields: [assetId], references: [id])
+}
+
+model SoftwareLicense {
+  id              String   @id @default(uuid())
+  name            String
+  publisher       String
+  licenseKey      String?
+  seatsTotal      Int      @default(1)
+  seatsAllocated  Int      @default(0)
+  expiryDate      DateTime?
+  status          String   @default("ACTIVE") // ACTIVE, EXPIRED, REVOKED
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Vendor {
+  id          String   @id @default(uuid())
+  name        String
+  contactName String?
+  email       String?
+  phone       String?
+  status      String   @default("ACTIVE") // ACTIVE, INACTIVE
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Consumable {
+  id           String   @id @default(uuid())
+  name         String
+  category     String
+  quantity     Int      @default(0)
+  reorderPoint Int      @default(5)
+  cost         Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model PurchaseOrder {
+  id          String   @id @default(uuid())
+  poNumber    String   @unique
+  vendorName  String
+  status      String   @default("PENDING") // PENDING, APPROVED, DELIVERED, CANCELLED
+  totalAmount Float    @default(0)
+  orderDate   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Location {
+  id        String   @id @default(uuid())
+  name      String
+  address   String?
+  city      String?
+  state     String?
+  zip       String?
+  status    String   @default("ACTIVE") // ACTIVE, INACTIVE
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MaintenanceSchedule {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  frequency   String   @default("MONTHLY") // WEEKLY, MONTHLY, QUARTERLY, ANNUALLY
+  nextDueDate DateTime?
+  status      String   @default("ACTIVE") // ACTIVE, PAUSED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ApprovalRequest {
+  id            String   @id @default(uuid())
+  title         String
+  requestorName String
+  requestedItem String
+  status        String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  comments      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
