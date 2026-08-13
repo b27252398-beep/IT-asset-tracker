@@ -162,3 +162,9 @@ export async function downloadAssetsCSV() {
   link.parentNode.removeChild(link);
   window.URL.revokeObjectURL(url);
 }
+
+/** Bulk imports assets from parsed JSON array */
+export async function importAssetsCSV(assetsArray) {
+  const { data } = await api.post('/assets/import', { assets: assetsArray });
+  return data;
+}

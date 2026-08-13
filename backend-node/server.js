@@ -279,6 +279,35 @@ app.get('/api/reports/assets/csv', async (req, res) => {
   }
 });
 
+// POST /api/assets/import
+app.post('/api/assets/import', async (req, res) => {
+  try {
+    const { assets } = req.body;
+    if (!assets || !Array.isArray(assets) || assets.length === 0) {
+      return res.status(400).json({ success: false, message: 'Invalid or empty asset data' });
+    }
+
+    // Clean and validate data before insert
+    const validAssets = assets.map(a => ({
+      name: a.name || 'Imported Asset',
+      assetTag: a.assetTag || `IMP-${Math.floor(Math.random() * 10000)}`,
+      category: a.category || 'OTHER',
+      status: a.status || 'AVAILABLE',
+      location: a.location || 'HQ',
+    }));
+
+    // Bulk insert using Prisma
+    const result = await prisma.asset.createMany({
+      data: validAssets,
+      skipDuplicates: true // Will skip if assetTag is duplicated assuming it's unique
+    });
+
+    res.status(201).json({ success: true, count: result.count });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // GET /api/employees
 app.get('/api/employees', async (req, res) => {
   const employees = await prisma.employee.findMany();

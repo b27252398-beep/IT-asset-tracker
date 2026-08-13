@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { fetchAssets, createAsset, updateAsset, checkOutAsset, checkInAsset, fetchAssetLogs, fetchMaintenanceLogs, createMaintenanceRecord, updateMaintenanceRecord, downloadAssetsCSV } from "../api/assetApi";
+import { fetchAssets, createAsset, updateAsset, checkOutAsset, checkInAsset, fetchAssetLogs, fetchMaintenanceLogs, createMaintenanceRecord, updateMaintenanceRecord, downloadAssetsCSV, importAssetsCSV } from "../api/assetApi";
 import { fetchEmployees } from "../api/employeeApi";
 import { useAuthStore } from "../store/authStore";
 import { QRCodeSVG } from "qrcode.react";
-import { Plus, Search, Filter, Monitor, Laptop, Smartphone, Server, X, Printer, Download } from "lucide-react";
+import { Plus, Search, Filter, Monitor, Laptop, Smartphone, Server, X, Printer, Download, Upload } from "lucide-react";
 
 export default function Assets() {
   const { userRole } = useAuthStore();
@@ -18,6 +18,7 @@ export default function Assets() {
   const [editAsset, setEditAsset] = useState<any>(null);
   const [editError, setEditError] = useState("");
   const [employees, setEmployees] = useState<any[]>([]);
+  const [importing, setImporting] = useState(false);
   const [checkOutAssetId, setCheckOutAssetId] = useState<string | null>(null);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [assetLogs, setAssetLogs] = useState<any[]>([]);
@@ -133,11 +134,54 @@ export default function Assets() {
     try {
       await checkOutAsset(checkOutAssetId, selectedEmployeeId);
       setCheckOutAssetId(null);
-      setSelectedEmployeeId("");
+      setIsAddModalOpen(false);
       loadAssets();
-    } catch (error: any) {
-      alert(error.message || "Failed to check out asset");
+    } catch (err: any) {
+      setSubmitError(err.message || "Failed to add asset");
     }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const csv = event.target?.result as string;
+        const lines = csv.split('\n').filter(l => l.trim() !== '');
+        if (lines.length <= 1) return;
+        
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const assets = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+          const vals = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+          const asset: any = {};
+          headers.forEach((h, idx) => {
+            if (h === 'asset_tag' || h === 'assettag') asset.assetTag = vals[idx];
+            if (h === 'name') asset.name = vals[idx];
+            if (h === 'category') asset.category = vals[idx];
+            if (h === 'location') asset.location = vals[idx];
+            if (h === 'status') asset.status = vals[idx];
+          });
+          if (asset.name || asset.assetTag) assets.push(asset);
+        }
+
+        await importAssetsCSV(assets);
+        loadAssets();
+        alert(`Successfully imported ${assets.length} assets!`);
+      } catch (err) {
+        console.error("Import failed:", err);
+        alert("Failed to import CSV. Check format.");
+      } finally {
+        setImporting(false);
+        // Reset input
+        e.target.value = '';
+      }
+    };
+    reader.readAsText(file);
   };
 
   const handleCheckIn = async (assetId: string) => {
@@ -189,6 +233,26 @@ export default function Assets() {
           <p className="text-slate-500 text-sm mt-1">Manage and track all hardware assets across the organization.</p>
         </div>
         <div className="flex items-center space-x-3">
+          <div className="relative">
+            <input 
+              type="file" 
+              accept=".csv"
+              onChange={handleFileUpload}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              disabled={importing}
+              title="Upload CSV to Bulk Import"
+            />
+            <button 
+              className={`inline-flex items-center justify-center px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg shadow-sm transition-colors ${importing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50 focus:ring-4 focus:ring-slate-100'}`}
+            >
+              {importing ? (
+                <div className="w-4 h-4 mr-2 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <Upload className="w-4 h-4 mr-2" />
+              )}
+              Import CSV
+            </button>
+          </div>
           <button 
             onClick={downloadAssetsCSV}
             className="inline-flex items-center justify-center px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 focus:ring-4 focus:ring-slate-100 transition-colors shadow-sm cursor-pointer"
