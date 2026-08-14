@@ -1,6 +1,6 @@
 import { ReactNode, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Laptop2, Users, Settings, LogOut, Bell, Key, Building2, Package, ShoppingCart, MapPin, Calendar, CheckSquare, Activity } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { LayoutDashboard, Laptop2, Users, Settings, LogOut, Bell, Key, Building2, Package, ShoppingCart, MapPin, Calendar, CheckSquare, Activity, Monitor, QrCode, LifeBuoy } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 
 interface DashboardLayoutProps {
@@ -9,23 +9,31 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const { userRole, setRole } = useAuthStore();
 
+  // Define which roles can see each module
+  // ADMIN = all | EMPLOYEE = limited | TECH_TEAM = technical focus
   const navigation = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
-    { name: "Assets", href: "/assets", icon: Laptop2 },
-    { name: "Software", href: "/software", icon: Key },
-    { name: "Vendors", href: "/vendors", icon: Building2 },
-    { name: "Consumables", href: "/consumables", icon: Package },
-    { name: "Purchase Orders", href: "/purchase-orders", icon: ShoppingCart },
-    { name: "Facilities", href: "/locations", icon: MapPin },
-    { name: "Schedules", href: "/schedules", icon: Calendar },
-    { name: "Approvals", href: "/approvals", icon: CheckSquare },
-    { name: "Audit Logs", href: "/audit-logs", icon: Activity },
-    { name: "Employees", href: "/employees", icon: Users },
-    { name: "Settings", href: "/settings", icon: Settings },
+    { name: "Dashboard",       href: "/",               icon: LayoutDashboard, roles: ["ADMIN", "EMPLOYEE", "TECH_TEAM"] },
+    { name: "Assets",          href: "/assets",          icon: Laptop2,         roles: ["ADMIN", "TECH_TEAM"] },
+    { name: "Software",        href: "/software",        icon: Key,             roles: ["ADMIN"] },
+    { name: "Vendors",         href: "/vendors",         icon: Building2,       roles: ["ADMIN"] },
+    { name: "Consumables",     href: "/consumables",     icon: Package,         roles: ["ADMIN"] },
+    { name: "Purchase Orders", href: "/purchase-orders", icon: ShoppingCart,    roles: ["ADMIN"] },
+    { name: "Facilities",      href: "/locations",       icon: MapPin,          roles: ["ADMIN"] },
+    { name: "Schedules",       href: "/schedules",       icon: Calendar,        roles: ["ADMIN"] },
+    { name: "Approvals",       href: "/approvals",       icon: CheckSquare,     roles: ["ADMIN"] },
+    { name: "Helpdesk",        href: "/issues",          icon: LifeBuoy,        roles: ["ADMIN", "EMPLOYEE", "TECH_TEAM"] },
+    { name: "Scanner",         href: "/scanner",         icon: QrCode,          roles: ["ADMIN", "EMPLOYEE", "TECH_TEAM"] },
+    { name: "Audit Logs",      href: "/audit-logs",      icon: Activity,        roles: ["ADMIN"] },
+    { name: "Employees",       href: "/employees",       icon: Users,           roles: ["ADMIN"] },
+    { name: "Settings",        href: "/settings",        icon: Settings,        roles: ["ADMIN", "EMPLOYEE", "TECH_TEAM"] },
   ];
+
+  // Filter navigation based on the current role
+  const visibleNavigation = navigation.filter(item => item.roles.includes(userRole));
 
   return (
     <div className="flex h-screen bg-slate-50 text-slate-900">
@@ -37,7 +45,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
         
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-          {navigation.map((item) => {
+          {visibleNavigation.map((item) => {
             const isActive = location.pathname === item.href;
             const Icon = item.icon;
             
@@ -62,7 +70,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="px-4 py-4">
           <div className="bg-slate-800 rounded-lg p-3">
             <p className="text-xs text-slate-400 font-semibold mb-2 uppercase tracking-wider">Test RBAC</p>
-            <div className="flex rounded-md p-1 bg-slate-900 border border-slate-700">
+            <div className="flex rounded-md p-1 bg-slate-900 border border-slate-700 gap-0.5">
               <button 
                 onClick={() => setRole('ADMIN')}
                 className={`flex-1 text-xs py-1.5 rounded font-medium transition-colors cursor-pointer ${userRole === 'ADMIN' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-300'}`}
@@ -73,7 +81,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 onClick={() => setRole('EMPLOYEE')}
                 className={`flex-1 text-xs py-1.5 rounded font-medium transition-colors cursor-pointer ${userRole === 'EMPLOYEE' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-300'}`}
               >
-                Employee
+                Staff
+              </button>
+              <button 
+                onClick={() => setRole('TECH_TEAM')}
+                className={`flex-1 text-xs py-1.5 rounded font-medium transition-colors cursor-pointer ${userRole === 'TECH_TEAM' ? 'bg-emerald-600 text-white shadow' : 'text-slate-400 hover:text-slate-300'}`}
+              >
+                Tech
               </button>
             </div>
           </div>
@@ -83,6 +97,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div 
             onClick={() => {
               useAuthStore.getState().logout();
+              navigate('/portal');
             }}
             className="flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
           >
@@ -91,7 +106,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
             <div className="flex-1 truncate">
               <p className="text-sm font-medium text-white">John Doe</p>
-              <p className="text-xs text-slate-500">{userRole === 'ADMIN' ? 'IT Administrator' : 'Staff Employee'}</p>
+              <p className="text-xs text-slate-500">{userRole === 'ADMIN' ? 'IT Administrator' : userRole === 'TECH_TEAM' ? 'Technical Support' : 'Staff Employee'}</p>
             </div>
             <LogOut className="w-4 h-4 ml-2" />
           </div>

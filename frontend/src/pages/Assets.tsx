@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { fetchAssets, createAsset, updateAsset, checkOutAsset, checkInAsset, fetchAssetLogs, fetchMaintenanceLogs, createMaintenanceRecord, updateMaintenanceRecord, downloadAssetsCSV, importAssetsCSV } from "../api/assetApi";
+import { useSearchParams } from "react-router-dom";
+import { fetchAssets, createAsset, updateAsset, checkOutAsset, checkInAsset, fetchAssetLogs, fetchMaintenanceLogs, createMaintenanceRecord, updateMaintenanceRecord, downloadAssetsCSV, importAssetsCSV, fetchAssetDocuments, uploadAssetDocument } from "../api/assetApi";
 import { fetchEmployees } from "../api/employeeApi";
 import { useAuthStore } from "../store/authStore";
 import { QRCodeSVG } from "qrcode.react";
@@ -23,13 +24,28 @@ export default function Assets() {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [assetLogs, setAssetLogs] = useState<any[]>([]);
   const [assetMaintenance, setAssetMaintenance] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'DETAILS' | 'MAINTENANCE'>('DETAILS');
+  const [assetDocuments, setAssetDocuments] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'DETAILS' | 'MAINTENANCE' | 'DOCUMENTS'>('DETAILS');
   const [newRepair, setNewRepair] = useState({ issueDescription: "", cost: "" });
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     loadAssets();
     loadEmployees();
   }, []);
+
+  useEffect(() => {
+    if (assets.length > 0) {
+      const viewId = searchParams.get('view');
+      if (viewId && (!viewAsset || viewAsset.id !== viewId)) {
+        const found = assets.find(a => a.id === viewId);
+        if (found) {
+          handleViewAsset(found);
+        }
+      }
+    }
+  }, [assets, searchParams, viewAsset]);
 
   const loadAssets = async () => {
     try {
@@ -85,14 +101,34 @@ export default function Assets() {
     setViewAsset(asset);
     setAssetLogs([]);
     setAssetMaintenance([]);
+    setAssetDocuments([]);
     setActiveTab('DETAILS');
     try {
       const logs = await fetchAssetLogs(asset.id);
       setAssetLogs(logs);
       const maintenance = await fetchMaintenanceLogs(asset.id);
       setAssetMaintenance(maintenance);
+      const docs = await fetchAssetDocuments(asset.id);
+      setAssetDocuments(docs);
     } catch (error) {
       console.error("Failed to fetch asset logs", error);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !viewAsset) return;
+    
+    try {
+      setUploadingDoc(true);
+      await uploadAssetDocument(viewAsset.id, file);
+      const docs = await fetchAssetDocuments(viewAsset.id);
+      setAssetDocuments(docs);
+    } catch (error) {
+      alert("Failed to upload document");
+    } finally {
+      setUploadingDoc(false);
+      if (e.target) e.target.value = '';
     }
   };
 
@@ -141,7 +177,7 @@ export default function Assets() {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -237,7 +273,7 @@ export default function Assets() {
             <input 
               type="file" 
               accept=".csv"
-              onChange={handleFileUpload}
+              onChange={handleCsvUpload}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               disabled={importing}
               title="Upload CSV to Bulk Import"
@@ -477,13 +513,13 @@ export default function Assets() {
       {viewAsset && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-slate-900/50" aria-hidden="true" onClick={() => setViewAsset(null)}></div>
+            <div className="fixed inset-0 bg-slate-900/50" aria-hidden="true" onClick={() => { setViewAsset(null); setSearchParams({}); }}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div className="relative z-10 inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg leading-6 font-medium text-slate-900">Asset Details</h3>
-                  <button onClick={() => setViewAsset(null)} className="text-slate-400 hover:text-slate-500 cursor-pointer">
+                  <button onClick={() => { setViewAsset(null); setSearchParams({}); }} className="text-slate-400 hover:text-slate-500 cursor-pointer">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
@@ -501,6 +537,12 @@ export default function Assets() {
                     className={`pb-3 px-1 mr-6 font-medium text-sm transition-colors border-b-2 ${activeTab === 'MAINTENANCE' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}
                   >
                     Maintenance & Repairs
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('DOCUMENTS')}
+                    className={`pb-3 px-1 font-medium text-sm transition-colors border-b-2 ${activeTab === 'DOCUMENTS' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}
+                  >
+                    Documents
                   </button>
                 </div>
 
@@ -662,8 +704,61 @@ export default function Assets() {
                     </div>
                   )}
 
+                  {activeTab === 'DOCUMENTS' && (
+                    <div className="space-y-6">
+                      <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-6 text-center">
+                        <div className="flex flex-col items-center justify-center">
+                          <Upload className="w-8 h-8 text-indigo-500 mb-3" />
+                          <h4 className="font-semibold text-slate-900">Upload Document</h4>
+                          <p className="text-xs text-slate-500 mt-1 mb-4">Attach receipts, manuals, or photos</p>
+                          
+                          <label className="relative cursor-pointer">
+                            <input 
+                              type="file" 
+                              className="hidden" 
+                              onChange={handleFileUpload} 
+                              disabled={uploadingDoc}
+                            />
+                            <span className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white ${uploadingDoc ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} transition-colors`}>
+                              {uploadingDoc ? 'Uploading...' : 'Select File'}
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-slate-900 text-sm">Attached Documents</h4>
+                        {assetDocuments.length === 0 ? (
+                          <p className="text-sm text-slate-500 text-center py-4 bg-slate-50 rounded-lg border border-dashed border-slate-200">No documents attached yet.</p>
+                        ) : (
+                          assetDocuments.map((doc) => (
+                            <div key={doc.id} className="flex items-center justify-between bg-white border border-slate-100 p-3 rounded-lg shadow-sm">
+                              <div className="flex items-center space-x-3 overflow-hidden">
+                                <div className="w-8 h-8 bg-slate-100 text-slate-500 rounded flex items-center justify-center shrink-0">
+                                  <Download className="w-4 h-4" />
+                                </div>
+                                <div className="truncate text-left flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-slate-900 truncate">{doc.filename}</p>
+                                  <p className="text-xs text-slate-500">{(doc.size / 1024).toFixed(1)} KB • {new Date(doc.createdAt).toLocaleDateString()}</p>
+                                </div>
+                              </div>
+                              <a 
+                                href={`http://localhost:8080${doc.filepath}`} 
+                                target="_blank" 
+                                rel="noreferrer"
+                                className="ml-4 p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors shrink-0"
+                              >
+                                View
+                              </a>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100">
-                    <button type="button" onClick={() => setViewAsset(null)} className="w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm cursor-pointer">
+                    <button type="button" onClick={() => { setViewAsset(null); setSearchParams({}); }} className="w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm cursor-pointer">
                       Close
                     </button>
                   </div>

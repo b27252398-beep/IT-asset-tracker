@@ -19,7 +19,7 @@ const itemVariants = {
   visible: { 
     y: 0, 
     opacity: 1,
-    transition: { type: "spring", stiffness: 300, damping: 24 }
+    transition: { type: "spring" as const, stiffness: 300, damping: 24 }
   }
 };
 
@@ -28,7 +28,7 @@ export default function Vendors() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
-  const [newVendor, setNewVendor] = useState({ name: "", contactName: "", email: "", phone: "" });
+  const [newVendor, setNewVendor] = useState({ name: '', contactPerson: '', email: '', phone: '' });
   const [editVendor, setEditVendor] = useState<any>(null);
 
   // Queries
@@ -43,7 +43,7 @@ export default function Vendors() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendors'] });
       setIsAddModalOpen(false);
-      setNewVendor({ name: "", contactName: "", email: "", phone: "" });
+      setNewVendor({ name: "", contactPerson: "", email: "", phone: "" });
     }
   });
 
@@ -207,7 +207,7 @@ export default function Vendors() {
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onClick={() => setIsAddModalOpen(false)}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
+            <div className="relative z-10 inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -222,7 +222,7 @@ export default function Vendors() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700">Contact Name</label>
-                        <input type="text" value={newVendor.contactName} onChange={e => setNewVendor({...newVendor, contactName: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Jane Doe" />
+                        <input type="text" value={newVendor.contactPerson} onChange={e => setNewVendor({...newVendor, contactPerson: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Jane Doe" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -257,7 +257,7 @@ export default function Vendors() {
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onClick={() => setIsEditModalOpen(false)}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
+            <div className="relative z-10 inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">

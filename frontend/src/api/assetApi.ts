@@ -139,10 +139,25 @@ export async function createMaintenanceRecord(id, payload) {
 }
 
 /** Updates a maintenance record */
-export async function updateMaintenanceRecord(maintenanceId, payload) {
+export async function updateMaintenanceRecord(maintenanceId: string, payload: any) {
   const { data } = await api.put(`/maintenance/${maintenanceId}`, payload);
   return data;
 }
+
+// Document Upload APIs
+export const fetchAssetDocuments = async (assetId: string) => {
+  const response = await api.get(`/assets/${assetId}/documents`);
+  return response.data.data;
+};
+
+export const uploadAssetDocument = async (assetId: string, file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.post(`/assets/${assetId}/documents`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return response.data.data;
+};
 
 /** Downloads the CSV report of all assets */
 export async function downloadAssetsCSV() {

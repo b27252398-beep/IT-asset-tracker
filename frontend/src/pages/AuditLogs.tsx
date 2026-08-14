@@ -19,7 +19,7 @@ const itemVariants = {
   visible: { 
     y: 0, 
     opacity: 1,
-    transition: { type: "spring", stiffness: 300, damping: 24 }
+    transition: { type: "spring" as const, stiffness: 300, damping: 24 }
   }
 };
 
@@ -43,15 +43,12 @@ export default function AuditLogs() {
   });
 
   const generateTestLog = () => {
-    const actions = ["CREATE", "UPDATE", "DELETE", "LOGIN", "EXPORT"];
-    const entities = ["Asset", "User", "ApprovalRequest", "SoftwareLicense", "System"];
-    const users = ["SystemAdmin", "Jane Doe", "John Smith", "API_Service"];
+    const actions = ["STATUS_CHANGE", "EDIT", "ASSIGN", "UNASSIGN"];
     
     createMutation.mutate({
       action: actions[Math.floor(Math.random() * actions.length)],
-      entityType: entities[Math.floor(Math.random() * entities.length)],
-      entityId: `OBJ-${Math.floor(Math.random() * 9999)}`,
-      userName: users[Math.floor(Math.random() * users.length)],
+      assetId: "test-asset-id-1234",
+      performedBy: "SystemAdmin",
       details: "Simulated audit event generated for testing."
     });
   };
@@ -81,9 +78,13 @@ export default function AuditLogs() {
   };
 
   const filteredLogs = logs.filter((log: any) => {
-    const matchesSearch = log.userName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          log.entityType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          (log.details && log.details.toLowerCase().includes(searchTerm.toLowerCase()));
+    const user = log.performedBy || log.userName || "";
+    const type = "Asset";
+    const details = log.details || "";
+    
+    const matchesSearch = user.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          details.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesAction = filterAction === "ALL" || log.action === filterAction;
     return matchesSearch && matchesAction;
   });
@@ -180,18 +181,18 @@ export default function AuditLogs() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center">
-                        <span className="text-xs font-bold text-indigo-700">{log.userName.charAt(0)}</span>
+                        <span className="text-xs font-bold text-indigo-700">{(log.performedBy || log.userName || "?").charAt(0)}</span>
                       </div>
                       <div className="ml-3">
-                        <div className="text-sm font-medium text-slate-900">{log.userName}</div>
+                        <div className="text-sm font-medium text-slate-900">{log.performedBy || log.userName || "Unknown User"}</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center text-sm text-slate-900 font-medium">
-                      {getEntityIcon(log.entityType)}
-                      <span className="ml-2">{log.entityType}</span>
-                      {log.entityId && <span className="ml-1 text-slate-400 font-normal">#{log.entityId}</span>}
+                      {getEntityIcon('asset')}
+                      <span className="ml-2">Asset</span>
+                      {log.assetId && <span className="ml-1 text-slate-400 font-normal">#{log.assetId.slice(0,8)}</span>}
                     </div>
                   </td>
                   <td className="px-6 py-4">

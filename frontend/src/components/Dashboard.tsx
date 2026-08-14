@@ -1,4 +1,6 @@
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useAuthStore } from "../store/authStore";
 import { fetchDashboardMetrics, fetchAssets, fetchWarrantyAlerts, downloadAssetsCSV } from "../api/assetApi";
 import { Monitor, CheckCircle, Wrench, XCircle, ArrowUpRight, ShieldCheck, Laptop2, Server, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
@@ -19,10 +21,12 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } }
+  visible: { y: 0, opacity: 1, transition: { type: 'spring' as const, stiffness: 100 } }
 };
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  const { userRole } = useAuthStore();
   const { data: metrics, isLoading: isMetricsLoading } = useQuery({
     queryKey: ["dashboardMetrics"],
     queryFn: fetchDashboardMetrics,
@@ -69,21 +73,23 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold text-slate-900">Overview</h1>
           <p className="text-slate-500 text-sm mt-1">Real-time metrics and asset utilization across your organization.</p>
         </div>
-        <div className="flex gap-3 w-full sm:w-auto">
-          <button 
-            onClick={downloadAssetsCSV}
-            className="flex-1 sm:flex-none bg-white text-slate-700 px-4 py-2 rounded-lg border border-slate-200 font-medium hover:bg-slate-50 focus:ring-4 focus:ring-slate-100 transition-colors shadow-sm cursor-pointer"
-          >
-            Download Report
-          </button>
-          <button 
-            onClick={() => console.log("Redirecting to provisioning flow... (Mock)")}
-            className="flex-1 sm:flex-none flex items-center justify-center bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 transition-colors shadow-sm cursor-pointer"
-          >
-            <Monitor className="w-4 h-4 mr-2" />
-            Provision Asset
-          </button>
-        </div>
+        {userRole !== 'EMPLOYEE' && (
+          <div className="flex gap-3 w-full sm:w-auto">
+            <button 
+              onClick={downloadAssetsCSV}
+              className="flex-1 sm:flex-none bg-white text-slate-700 px-4 py-2 rounded-lg border border-slate-200 font-medium hover:bg-slate-50 focus:ring-4 focus:ring-slate-100 transition-colors shadow-sm cursor-pointer"
+            >
+              Download Report
+            </button>
+            <button 
+              onClick={() => navigate('/assets')}
+              className="flex-1 sm:flex-none flex items-center justify-center bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 transition-colors shadow-sm cursor-pointer"
+            >
+              <Monitor className="w-4 h-4 mr-2" />
+              Provision Asset
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Stats Grid */}
@@ -221,7 +227,9 @@ export default function Dashboard() {
                     <h4 className="font-semibold text-slate-800">{asset.name} <span className="text-xs text-slate-500 font-normal ml-2">({asset.assetTag})</span></h4>
                     <p className="text-sm text-red-600 mt-1">Warranty expired on {new Date(asset.warrantyExpiry).toLocaleDateString()}</p>
                   </div>
-                  <button className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">View Asset</button>
+                  {userRole !== 'EMPLOYEE' && (
+                    <button onClick={() => navigate(`/assets?view=${asset.id}`)} className="text-sm text-indigo-600 hover:text-indigo-800 font-medium cursor-pointer">View Asset</button>
+                  )}
                 </div>
               ))}
               
@@ -233,7 +241,9 @@ export default function Dashboard() {
                       <h4 className="font-semibold text-slate-800">{asset.name} <span className="text-xs text-slate-500 font-normal ml-2">({asset.assetTag})</span></h4>
                       <p className="text-sm text-amber-600 mt-1">Expires in {daysLeft} days ({new Date(asset.warrantyExpiry).toLocaleDateString()})</p>
                     </div>
-                    <button className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">View Asset</button>
+                    {userRole !== 'EMPLOYEE' && (
+                      <button onClick={() => navigate(`/assets?view=${asset.id}`)} className="text-sm text-indigo-600 hover:text-indigo-800 font-medium cursor-pointer">View Asset</button>
+                    )}
                   </div>
                 );
               })}
@@ -246,7 +256,9 @@ export default function Dashboard() {
       <motion.div variants={itemVariants} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
           <h3 className="text-lg font-semibold text-slate-800">Recent Inventory</h3>
-          <button className="text-sm font-medium text-indigo-600 hover:text-indigo-700">View All</button>
+          {userRole !== 'EMPLOYEE' && (
+            <button onClick={() => navigate('/assets')} className="text-sm font-medium text-indigo-600 hover:text-indigo-700 cursor-pointer">View All</button>
+          )}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">

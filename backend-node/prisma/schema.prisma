@@ -8,49 +8,52 @@ datasource db {
 }
 
 model Employee {
-  id         String   @id @default(uuid())
+  id         String @id @default(uuid())
   name       String
-  email      String   @unique
+  email      String @unique
   department String
-  role       String   // e.g. "Software Engineer"
-  status     String   @default("Active") // Active, On Leave, Terminated
-  
+  role       String // e.g. "Software Engineer"
+  status     String @default("Active") // Active, On Leave, Terminated
+
   // For RBAC
-  systemRole String   @default("EMPLOYEE") // EMPLOYEE, IT_SUPPORT, SUPER_ADMIN
-  
+  systemRole String @default("EMPLOYEE") // EMPLOYEE, IT_SUPPORT, SUPER_ADMIN
+
   // Relations
   assignedAssets Asset[] @relation("AssignedAssets")
+  reportedIssues IssueTicket[] @relation("ReportedIssues")
 }
 
 model Asset {
-  id           String   @id @default(uuid())
-  assetTag     String   @unique
-  serialNumber String?
-  name         String
-  category     String
-  status       String   @default("AVAILABLE") // AVAILABLE, ASSIGNED, IN_REPAIR, RETIRED
-  location     String?
+  id             String    @id @default(uuid())
+  assetTag       String    @unique
+  serialNumber   String?
+  name           String
+  category       String
+  status         String    @default("AVAILABLE") // AVAILABLE, ASSIGNED, IN_REPAIR, RETIRED
+  location       String?
   warrantyExpiry DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
   // Relations
-  employeeId   String?
-  employee     Employee? @relation("AssignedAssets", fields: [employeeId], references: [id])
-  logs         AuditLog[]
-  maintenance  Maintenance[]
+  employeeId  String?
+  employee    Employee?     @relation("AssignedAssets", fields: [employeeId], references: [id])
+  logs        AuditLog[]
+  maintenance Maintenance[]
+  documents   Document[]
+  issues      IssueTicket[]
 }
 
 model AuditLog {
   id          String   @id @default(uuid())
-  action      String   // CREATE, EDIT, STATUS_CHANGE, ASSIGN, UNASSIGN
+  action      String // CREATE, EDIT, STATUS_CHANGE, ASSIGN, UNASSIGN
   performedBy String
   details     String?
   timestamp   DateTime @default(now())
-  
+
   // Relations
-  assetId     String
-  asset       Asset    @relation(fields: [assetId], references: [id])
+  assetId String
+  asset   Asset  @relation(fields: [assetId], references: [id])
 }
 
 model Maintenance {
@@ -60,23 +63,36 @@ model Maintenance {
   status           String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  
+
   // Relations
-  assetId          String
-  asset            Asset    @relation(fields: [assetId], references: [id])
+  assetId String
+  asset   Asset  @relation(fields: [assetId], references: [id])
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  assetId   String
+  filename  String
+  filepath  String
+  mimetype  String
+  size      Int
+  createdAt DateTime @default(now())
+
+  // Relations
+  asset Asset @relation(fields: [assetId], references: [id])
 }
 
 model SoftwareLicense {
-  id              String   @id @default(uuid())
-  name            String
-  publisher       String
-  licenseKey      String?
-  seatsTotal      Int      @default(1)
-  seatsAllocated  Int      @default(0)
-  expiryDate      DateTime?
-  status          String   @default("ACTIVE") // ACTIVE, EXPIRED, REVOKED
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String    @id @default(uuid())
+  name           String
+  publisher      String
+  licenseKey     String?
+  seatsTotal     Int       @default(1)
+  seatsAllocated Int       @default(0)
+  expiryDate     DateTime?
+  status         String    @default("ACTIVE") // ACTIVE, EXPIRED, REVOKED
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model Vendor {
@@ -102,14 +118,14 @@ model Consumable {
 }
 
 model PurchaseOrder {
-  id          String   @id @default(uuid())
-  poNumber    String   @unique
+  id          String    @id @default(uuid())
+  poNumber    String    @unique
   vendorName  String
-  status      String   @default("PENDING") // PENDING, APPROVED, DELIVERED, CANCELLED
-  totalAmount Float    @default(0)
+  status      String    @default("PENDING") // PENDING, APPROVED, DELIVERED, CANCELLED
+  totalAmount Float     @default(0)
   orderDate   DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Location {
@@ -125,14 +141,14 @@ model Location {
 }
 
 model MaintenanceSchedule {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   description String?
-  frequency   String   @default("MONTHLY") // WEEKLY, MONTHLY, QUARTERLY, ANNUALLY
+  frequency   String    @default("MONTHLY") // WEEKLY, MONTHLY, QUARTERLY, ANNUALLY
   nextDueDate DateTime?
-  status      String   @default("ACTIVE") // ACTIVE, PAUSED
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      String    @default("ACTIVE") // ACTIVE, PAUSED
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model ApprovalRequest {
@@ -144,4 +160,24 @@ model ApprovalRequest {
   comments      String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model IssueTicket {
+  id              String   @id @default(uuid())
+  title           String
+  description     String
+  priority        String   @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  status          String   @default("OPEN") // OPEN, ACCEPTED, REJECTED, ASSIGNED, IN_PROGRESS, RESOLVED
+  rejectionReason String?  // Admin fills when rejecting
+  techNote        String?  // Admin adds when forwarding to tech team
+  resolvedNote    String?  // Tech team adds when resolving
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  assetId     String
+  asset       Asset    @relation(fields: [assetId], references: [id])
+  
+  employeeId  String
+  employee    Employee @relation("ReportedIssues", fields: [employeeId], references: [id])
 }

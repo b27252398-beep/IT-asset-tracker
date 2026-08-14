@@ -5,12 +5,13 @@ import {
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchApprovals, createApproval, updateApproval, deleteApproval } from '../api/approvalApi';
+import { useAuthStore } from '../store/authStore';
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { 
     opacity: 1,
-    transition: { staggerChildren: 0.1 }
+    transition: { staggerChildren: 0.05 }
   }
 };
 
@@ -19,12 +20,13 @@ const itemVariants = {
   visible: { 
     y: 0, 
     opacity: 1,
-    transition: { type: "spring", stiffness: 300, damping: 24 }
+    transition: { type: "spring" as const, stiffness: 300, damping: 24 }
   }
 };
 
 export default function Approvals() {
   const queryClient = useQueryClient();
+  const userRole = useAuthStore(state => state.userRole);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   
   const [newReq, setNewReq] = useState({ title: "", requestorName: "", requestedItem: "", status: "PENDING", comments: "" });
@@ -175,7 +177,7 @@ export default function Approvals() {
               <span className="text-xs text-slate-400">Created: {new Date(req.createdAt).toLocaleDateString()}</span>
               
               <div className="flex space-x-2">
-                {req.status === 'PENDING' && (
+                {userRole === 'ADMIN' && req.status === 'PENDING' && (
                   <>
                     <button 
                       onClick={() => handleStatusChange(req, 'APPROVED')}
@@ -193,13 +195,15 @@ export default function Approvals() {
                     </button>
                   </>
                 )}
-                <button 
-                  onClick={() => handleDelete(req.id)}
-                  className="p-1.5 bg-white border border-slate-200 text-slate-500 hover:text-red-600 hover:border-red-200 rounded-md transition-colors"
-                  title="Delete Record"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {userRole === 'ADMIN' && (
+                  <button 
+                    onClick={() => handleDelete(req.id)}
+                    className="p-1.5 bg-white border border-slate-200 text-slate-500 hover:text-red-600 hover:border-red-200 rounded-md transition-colors cursor-pointer"
+                    title="Delete Record"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </div>
           </motion.div>
@@ -227,7 +231,7 @@ export default function Approvals() {
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onClick={() => setIsAddModalOpen(false)}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
+            <div className="relative z-10 inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">

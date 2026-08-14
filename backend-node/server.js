@@ -1,6 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const { PrismaClient } = require('@prisma/client');
+const emailService = require('./emailService');
 require('dotenv').config();
 
 const app = express();
@@ -8,6 +12,25 @@ const prisma = new PrismaClient();
 
 app.use(cors());
 app.use(express.json());
+
+// Setup uploads directory
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)){
+    fs.mkdirSync(uploadDir);
+}
+app.use('/uploads', express.static(uploadDir));
+
+// Configure multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir)
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, uniqueSuffix + path.extname(file.originalname))
+  }
+});
+const upload = multer({ storage: storage });
 
 // Fake secret for mock JWT
 const MOCK_TOKEN = "mock-jwt-token-123";
@@ -20,6 +43,46 @@ const authMiddleware = (req, res, next) => {
   }
   next();
 };
+
+// ==========================================
+// PHASE 19: DOCUMENT & IMAGE UPLOADS
+// ==========================================
+
+// GET /api/assets/:id/documents
+app.get('/api/assets/:id/documents', async (req, res) => {
+  try {
+    const documents = await prisma.document.findMany({
+      where: { assetId: req.params.id },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json({ success: true, data: documents });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// POST /api/assets/:id/documents
+app.post('/api/assets/:id/documents', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    const document = await prisma.document.create({
+      data: {
+        assetId: req.params.id,
+        filename: req.file.originalname,
+        filepath: `/uploads/${req.file.filename}`,
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      }
+    });
+
+    res.status(201).json({ success: true, data: document });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
 
 // ==========================================
 // PHASE 6: MAINTENANCE & REPAIR MODULE
@@ -92,16 +155,38 @@ app.put('/api/maintenance/:id', async (req, res) => {
 });
 
 // --- AUTH ENDPOINTS ---
+// Credentials per portal:
+//   admin / admin123  → ADMIN
+//   staff / staff123  → EMPLOYEE
+//   tech  / tech123   → TECH_TEAM
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
-  if (username && password) {
-    return res.json({ 
-      success: true, 
-      message: "Login successful", 
-      data: { token: MOCK_TOKEN, user: { name: username, role: "ADMIN" } } 
+
+  const PORTAL_CREDENTIALS = {
+    admin: { password: 'admin123', role: 'ADMIN',     name: 'IT Administrator' },
+    staff: { password: 'staff123', role: 'EMPLOYEE',  name: 'Staff Member'     },
+    tech:  { password: 'tech123',  role: 'TECH_TEAM', name: 'Tech Support'     },
+  };
+
+  const cred = PORTAL_CREDENTIALS[username?.toLowerCase()];
+  if (cred && cred.password === password) {
+    return res.json({
+      success: true,
+      message: 'Login successful',
+      data: { token: MOCK_TOKEN, user: { name: cred.name, role: cred.role } }
     });
   }
-  return res.status(401).json({ success: false, message: "Invalid credentials" });
+
+  // Fallback: any credentials work (backward compatibility with old Login.tsx)
+  if (username && password) {
+    return res.json({
+      success: true,
+      message: 'Login successful',
+      data: { token: MOCK_TOKEN, user: { name: username, role: 'ADMIN' } }
+    });
+  }
+
+  return res.status(401).json({ success: false, message: 'Invalid credentials' });
 });
 
 // Protect all /api/assets routes
@@ -110,29 +195,233 @@ app.use('/api/employees', authMiddleware);
 
 // --- SEED DATABASE ON STARTUP IF EMPTY ---
 async function seedDatabase() {
+  // ── 1. EMPLOYEES ──────────────────────────────────────────
   const empCount = await prisma.employee.count();
   if (empCount === 0) {
     await prisma.employee.createMany({
       data: [
-        { name: "John Doe", email: "john@example.com", department: "Engineering", role: "Software Engineer", status: "Active" },
-        { name: "Jane Smith", email: "jane@example.com", department: "Design", role: "Product Designer", status: "Active" },
-        { name: "Mike Johnson", email: "mike@example.com", department: "HR", role: "HR Manager", status: "Active" },
-        { name: "Sarah Williams", email: "sarah@example.com", department: "Engineering", role: "DevOps Engineer", status: "On Leave" },
+        { id: 'emp-001', name: 'Raj Patel',      email: 'raj.patel@acmetech.com',      department: 'Engineering', role: 'Software Engineer',    status: 'Active',   systemRole: 'EMPLOYEE' },
+        { id: 'emp-002', name: 'Sarah Johnson',  email: 'sarah.j@acmetech.com',        department: 'Design',      role: 'Product Designer',      status: 'Active',   systemRole: 'EMPLOYEE' },
+        { id: 'emp-003', name: 'Mike Chen',      email: 'mike.chen@acmetech.com',      department: 'Engineering', role: 'DevOps Engineer',        status: 'Active',   systemRole: 'EMPLOYEE' },
+        { id: 'emp-004', name: 'Emma Williams',  email: 'emma.w@acmetech.com',         department: 'HR',          role: 'HR Manager',             status: 'Active',   systemRole: 'EMPLOYEE' },
+        { id: 'emp-005', name: 'David Kumar',    email: 'david.k@acmetech.com',        department: 'Engineering', role: 'Backend Developer',      status: 'Active',   systemRole: 'EMPLOYEE' },
+        { id: 'emp-006', name: 'Lisa Park',      email: 'lisa.park@acmetech.com',      department: 'Finance',     role: 'Finance Manager',        status: 'Active',   systemRole: 'EMPLOYEE' },
+        { id: 'emp-007', name: 'James Wilson',   email: 'james.w@acmetech.com',        department: 'Engineering', role: 'Frontend Developer',     status: 'Active',   systemRole: 'EMPLOYEE' },
+        { id: 'emp-008', name: 'Priya Sharma',   email: 'priya.s@acmetech.com',        department: 'Design',      role: 'UX Researcher',          status: 'On Leave', systemRole: 'EMPLOYEE' },
+        { id: 'emp-009', name: 'Tom Anderson',   email: 'tom.anderson@acmetech.com',   department: 'IT',          role: 'IT Support Specialist',  status: 'Active',   systemRole: 'IT_SUPPORT' },
+        { id: 'emp-010', name: 'Alex Martinez',  email: 'alex.m@acmetech.com',         department: 'Engineering', role: 'QA Engineer',            status: 'Active',   systemRole: 'EMPLOYEE' },
       ]
     });
   }
 
+  // ── 2. ASSETS ─────────────────────────────────────────────
   const assetCount = await prisma.asset.count();
   if (assetCount === 0) {
     await prisma.asset.createMany({
       data: [
-        { name: "MacBook Pro M3", assetTag: "TAG-2024-001", category: "LAPTOP", status: "AVAILABLE", location: "NY Office", serialNumber: "C02DG543" },
-        { name: "Dell XPS 15", assetTag: "TAG-2024-002", category: "LAPTOP", status: "AVAILABLE", location: "London Office", serialNumber: "5KG12" },
-        { name: "iPhone 15 Pro", assetTag: "TAG-2024-003", category: "MOBILE", status: "AVAILABLE", location: "NY Office", serialNumber: "F12GH4" },
-        { name: "LG UltraFine 5K", assetTag: "TAG-2024-004", category: "DESKTOP", status: "IN_REPAIR", location: "Remote", serialNumber: "LGUF009" }
+        { id: 'ast-001', name: 'MacBook Pro 14" M3',       assetTag: 'ACM-LAP-001', serialNumber: 'C02XG2ABMD6R', category: 'LAPTOP',      status: 'ASSIGNED',   location: 'New York HQ',      employeeId: 'emp-001', warrantyExpiry: new Date('2026-12-31') },
+        { id: 'ast-002', name: 'Dell XPS 15 9530',          assetTag: 'ACM-LAP-002', serialNumber: 'DXPS15-8823K', category: 'LAPTOP',      status: 'ASSIGNED',   location: 'New York HQ',      employeeId: 'emp-002', warrantyExpiry: new Date('2025-08-15') },
+        { id: 'ast-003', name: 'ThinkPad X1 Carbon Gen 11', assetTag: 'ACM-LAP-003', serialNumber: 'TPXC11-9912A', category: 'LAPTOP',      status: 'ASSIGNED',   location: 'London Office',    employeeId: 'emp-003', warrantyExpiry: new Date('2026-03-20') },
+        { id: 'ast-004', name: 'MacBook Air M2',             assetTag: 'ACM-LAP-004', serialNumber: 'C02YK0ABMD6T', category: 'LAPTOP',      status: 'AVAILABLE',  location: 'New York HQ',      warrantyExpiry: new Date('2027-01-15') },
+        { id: 'ast-005', name: 'HP EliteBook 840 G10',       assetTag: 'ACM-LAP-005', serialNumber: 'HPEB840-4421', category: 'LAPTOP',      status: 'AVAILABLE',  location: 'Bangalore Office', warrantyExpiry: new Date('2026-06-30') },
+        { id: 'ast-006', name: 'Dell UltraSharp 27" 4K',    assetTag: 'ACM-MON-001', serialNumber: 'DLUS27-1192B', category: 'DESKTOP',     status: 'ASSIGNED',   location: 'New York HQ',      employeeId: 'emp-004' },
+        { id: 'ast-007', name: 'LG 32" 4K UHD Monitor',     assetTag: 'ACM-MON-002', serialNumber: 'LG32UK-8821',  category: 'DESKTOP',     status: 'AVAILABLE',  location: 'London Office' },
+        { id: 'ast-008', name: 'Samsung 24" FHD Monitor',   assetTag: 'ACM-MON-003', serialNumber: 'SMNG24-3312', category: 'DESKTOP',     status: 'IN_REPAIR',  location: 'IT Storage' },
+        { id: 'ast-009', name: 'iPhone 15 Pro',              assetTag: 'ACM-MOB-001', serialNumber: 'IP15P-77231A', category: 'MOBILE',      status: 'ASSIGNED',   location: 'New York HQ',      employeeId: 'emp-005' },
+        { id: 'ast-010', name: 'Samsung Galaxy S24 Ultra',   assetTag: 'ACM-MOB-002', serialNumber: 'SGS24-6612C',  category: 'MOBILE',      status: 'ASSIGNED',   location: 'London Office',    employeeId: 'emp-006' },
+        { id: 'ast-011', name: 'Google Pixel 8 Pro',         assetTag: 'ACM-MOB-003', serialNumber: 'GPX8P-4421B',  category: 'MOBILE',      status: 'AVAILABLE',  location: 'IT Storage' },
+        { id: 'ast-012', name: 'iPad Pro 12.9" M2',          assetTag: 'ACM-TAB-001', serialNumber: 'IPADP-9921X',  category: 'MOBILE',      status: 'ASSIGNED',   location: 'New York HQ',      employeeId: 'emp-007' },
+        { id: 'ast-013', name: 'HP LaserJet Pro M404dn',     assetTag: 'ACM-PRN-001', serialNumber: 'HPLJ-5521PR',  category: 'PRINTER',     status: 'IN_REPAIR',  location: 'Floor 3' },
+        { id: 'ast-014', name: 'Epson WorkForce Pro WF-7840',assetTag: 'ACM-PRN-002', serialNumber: 'EPWF-8812PR',  category: 'PRINTER',     status: 'AVAILABLE',  location: 'Floor 1' },
+        { id: 'ast-015', name: 'Dell PowerEdge R750',         assetTag: 'ACM-SRV-001', serialNumber: 'DLPE-R750-01', category: 'SERVER',      status: 'AVAILABLE',  location: 'Server Room' },
+        { id: 'ast-016', name: 'Cisco Catalyst 2960-X',       assetTag: 'ACM-NET-001', serialNumber: 'CISCO-CAT-01', category: 'NETWORKING',  status: 'AVAILABLE',  location: 'Server Room' },
+        { id: 'ast-017', name: 'MacBook Pro 16" Intel 2019',  assetTag: 'ACM-LAP-006', serialNumber: 'C02ZDOLD9999', category: 'LAPTOP',      status: 'RETIRED',    location: 'Storage' },
+        { id: 'ast-018', name: 'Logitech MX Keys Keyboard',   assetTag: 'ACM-PER-001', serialNumber: 'LOGI-MXK-221', category: 'PERIPHERAL',  status: 'AVAILABLE',  location: 'IT Storage' },
       ]
     });
   }
+
+  // ── 3. SOFTWARE LICENSES ──────────────────────────────────
+  const swCount = await prisma.softwareLicense.count();
+  if (swCount === 0) {
+    await prisma.softwareLicense.createMany({
+      data: [
+        { name: 'Microsoft 365 Business', publisher: 'Microsoft',  licenseKey: 'M365-XXXX-XXXX-1001', seatsTotal: 50, seatsAllocated: 47, status: 'ACTIVE',   expiryDate: new Date('2025-12-31') },
+        { name: 'Adobe Creative Cloud',   publisher: 'Adobe',       licenseKey: 'ADCC-XXXX-XXXX-2002', seatsTotal: 10, seatsAllocated: 10, status: 'ACTIVE',   expiryDate: new Date('2025-09-30') },
+        { name: 'GitHub Enterprise',      publisher: 'GitHub',      licenseKey: 'GHEP-XXXX-XXXX-3003', seatsTotal: 25, seatsAllocated: 18, status: 'ACTIVE',   expiryDate: new Date('2026-01-15') },
+        { name: 'Slack Business+',        publisher: 'Salesforce',  licenseKey: 'SLBP-XXXX-XXXX-4004', seatsTotal: 50, seatsAllocated: 45, status: 'ACTIVE',   expiryDate: new Date('2025-11-30') },
+        { name: 'Figma Professional',     publisher: 'Figma Inc.',  licenseKey: 'FIGP-XXXX-XXXX-5005', seatsTotal: 5,  seatsAllocated: 5,  status: 'ACTIVE',   expiryDate: new Date('2025-10-15') },
+        { name: 'Zoom Pro',               publisher: 'Zoom',        licenseKey: 'ZMPRO-XXXX-XXXX-6006',seatsTotal: 20, seatsAllocated: 12, status: 'EXPIRED',  expiryDate: new Date('2024-06-30') },
+      ]
+    });
+  }
+
+  // ── 4. VENDORS ────────────────────────────────────────────
+  const vendorCount = await prisma.vendor.count();
+  if (vendorCount === 0) {
+    await prisma.vendor.createMany({
+      data: [
+        { name: 'Apple Inc.',         contactName: 'Tim Retail',    email: 'enterprise@apple.com',       phone: '+1-800-275-2273', status: 'ACTIVE'   },
+        { name: 'Dell Technologies',  contactName: 'Mark Sullivan',  email: 'enterprise@dell.com',        phone: '+1-800-289-3355', status: 'ACTIVE'   },
+        { name: 'Microsoft Corp.',    contactName: 'Satya Sales',    email: 'licensing@microsoft.com',    phone: '+1-800-642-7676', status: 'ACTIVE'   },
+        { name: 'Logitech',           contactName: 'Anne Dubois',    email: 'b2b@logitech.com',           phone: '+1-646-454-3200', status: 'ACTIVE'   },
+        { name: 'HP Inc.',            contactName: 'Sandra Brown',   email: 'enterprise@hp.com',          phone: '+1-800-752-0900', status: 'INACTIVE' },
+      ]
+    });
+  }
+
+  // ── 5. CONSUMABLES ────────────────────────────────────────
+  const consCount = await prisma.consumable.count();
+  if (consCount === 0) {
+    await prisma.consumable.createMany({
+      data: [
+        { name: 'A4 Paper Reams (500 sheets)', category: 'Office Supplies', quantity: 45, reorderPoint: 20, cost: 5.99  },
+        { name: 'HP Ink Cartridge (Black)',     category: 'Printer Supplies', quantity: 4,  reorderPoint: 10, cost: 24.99 },
+        { name: 'USB-C to USB-A Cable 2m',      category: 'Cables',          quantity: 23, reorderPoint: 15, cost: 12.99 },
+        { name: 'AA Batteries (Pack of 4)',      category: 'Electronics',     quantity: 6,  reorderPoint: 10, cost: 3.49  },
+        { name: 'Screen Cleaning Wipes',         category: 'Office Supplies', quantity: 50, reorderPoint: 25, cost: 8.99  },
+        { name: 'Cat6 Ethernet Cable 5m',        category: 'Cables',          quantity: 12, reorderPoint: 8,  cost: 9.99  },
+      ]
+    });
+  }
+
+  // ── 6. PURCHASE ORDERS ────────────────────────────────────
+  const poCount = await prisma.purchaseOrder.count();
+  if (poCount === 0) {
+    await prisma.purchaseOrder.createMany({
+      data: [
+        { poNumber: 'PO-2024-001', vendorName: 'Dell Technologies', status: 'DELIVERED',  totalAmount: 4500.00,  orderDate: new Date('2024-01-15') },
+        { poNumber: 'PO-2024-002', vendorName: 'Apple Inc.',         status: 'APPROVED',   totalAmount: 12000.00, orderDate: new Date('2024-03-01') },
+        { poNumber: 'PO-2024-003', vendorName: 'Logitech',           status: 'PENDING',    totalAmount: 850.00,   orderDate: new Date('2024-06-10') },
+        { poNumber: 'PO-2024-004', vendorName: 'Microsoft Corp.',    status: 'DELIVERED',  totalAmount: 2400.00,  orderDate: new Date('2024-02-20') },
+        { poNumber: 'PO-2024-005', vendorName: 'HP Inc.',            status: 'CANCELLED',  totalAmount: 3200.00,  orderDate: new Date('2024-04-05') },
+      ]
+    });
+  }
+
+  // ── 7. LOCATIONS ──────────────────────────────────────────
+  const locCount = await prisma.location.count();
+  if (locCount === 0) {
+    await prisma.location.createMany({
+      data: [
+        { name: 'New York HQ',       address: '350 Fifth Avenue',   city: 'New York',   state: 'NY',  zip: '10118', status: 'ACTIVE'   },
+        { name: 'London Office',     address: '30 St Mary Axe',     city: 'London',     state: 'ENG', zip: 'EC3A 8BF', status: 'ACTIVE' },
+        { name: 'Bangalore Office',  address: '1 MG Road, Unit 12', city: 'Bangalore',  state: 'KA',  zip: '560001',status: 'ACTIVE'   },
+        { name: 'Remote / WFH',      address: 'N/A',                city: 'Various',    state: 'N/A', zip: 'N/A',   status: 'ACTIVE'   },
+      ]
+    });
+  }
+
+  // ── 8. MAINTENANCE SCHEDULES ──────────────────────────────
+  const schedCount = await prisma.maintenanceSchedule.count();
+  if (schedCount === 0) {
+    await prisma.maintenanceSchedule.createMany({
+      data: [
+        { title: 'Quarterly Laptop Health Check',  description: 'Full diagnostic on all laptops — battery, storage, OS updates.',    frequency: 'QUARTERLY', nextDueDate: new Date('2025-09-01'), status: 'ACTIVE'  },
+        { title: 'Monthly Printer Service',         description: 'Clean print heads, check toner levels, test print quality.',         frequency: 'MONTHLY',   nextDueDate: new Date('2025-08-20'), status: 'ACTIVE'  },
+        { title: 'Annual Server Audit',             description: 'Full hardware and software audit of all server infrastructure.',      frequency: 'ANNUALLY',  nextDueDate: new Date('2025-12-01'), status: 'ACTIVE'  },
+        { title: 'Weekly Backup Verification',      description: 'Verify all automated backups completed successfully overnight.',      frequency: 'WEEKLY',    nextDueDate: new Date('2025-08-15'), status: 'ACTIVE'  },
+        { title: 'Bi-Annual Software License Audit',description: 'Reconcile software seat usage vs. allocated licenses across teams.', frequency: 'ANNUALLY',  nextDueDate: new Date('2026-01-15'), status: 'PAUSED'  },
+      ]
+    });
+  }
+
+  // ── 9. APPROVAL REQUESTS ──────────────────────────────────
+  const approvalCount = await prisma.approvalRequest.count();
+  if (approvalCount === 0) {
+    await prisma.approvalRequest.createMany({
+      data: [
+        { title: 'New MacBook Pro Request',      requestorName: 'Raj Patel',     requestedItem: 'MacBook Pro 16" M3',    status: 'PENDING',  comments: 'Current laptop is 4 years old and struggling with dev environments.' },
+        { title: 'Additional Monitor Approval',  requestorName: 'Sarah Johnson', requestedItem: 'Dell UltraSharp 27"',   status: 'APPROVED', comments: 'Approved — improves design productivity significantly.' },
+        { title: 'Standing Desk Request',        requestorName: 'Emma Williams', requestedItem: 'Ergonomic Standing Desk',status: 'REJECTED', comments: 'Outside IT asset scope. Please raise with Facilities team.' },
+        { title: 'iPad for Field Visits',        requestorName: 'Lisa Park',     requestedItem: 'iPad Pro 11" M4',       status: 'PENDING',  comments: 'Required for client presentations and field data collection.' },
+        { title: 'Adobe License Expansion',      requestorName: 'Priya Sharma',  requestedItem: 'Adobe CC — 2 extra seats',status: 'APPROVED',comments: 'Approved — all existing seats are in use.' },
+        { title: 'Noise-Cancelling Headset',     requestorName: 'James Wilson',  requestedItem: 'Sony WH-1000XM5',       status: 'PENDING',  comments: 'Open office environment is affecting concentration.' },
+      ]
+    });
+  }
+
+  // ── 10. HELPDESK TICKETS (full workflow demo) ─────────────
+  const issueCount = await prisma.issueTicket.count();
+  if (issueCount === 0) {
+    await prisma.issueTicket.createMany({
+      data: [
+        {
+          title: 'Laptop keyboard not responding',
+          description: 'Several keys on my laptop keyboard have stopped working — specifically R, T, and Y. Tried restarting but issue persists.',
+          priority: 'HIGH', status: 'OPEN',
+          assetId: 'ast-001', employeeId: 'emp-001'
+        },
+        {
+          title: 'Screen flickering when on battery',
+          description: 'The screen flickers intermittently whenever the laptop is unplugged from power. Only happens on battery mode.',
+          priority: 'MEDIUM', status: 'ACCEPTED',
+          assetId: 'ast-002', employeeId: 'emp-002'
+        },
+        {
+          title: 'Unable to connect to company VPN',
+          description: 'Cannot connect to the Bangalore VPN endpoint since yesterday. Error: "Authentication timeout". Other office VPNs work fine.',
+          priority: 'CRITICAL', status: 'ASSIGNED',
+          techNote: 'Check VPN server certificate on Bangalore endpoint — may have expired. Coordinate with network team. Asset location: London Office.',
+          assetId: 'ast-003', employeeId: 'emp-003'
+        },
+        {
+          title: 'HP Printer offline — Floor 3',
+          description: 'The HP LaserJet on Floor 3 shows "Offline" on all workstations. Print jobs are queuing but not printing.',
+          priority: 'HIGH', status: 'IN_PROGRESS',
+          techNote: 'Printer has paper jam in rear tray and low toner. Ordered replacement cartridges.',
+          assetId: 'ast-013', employeeId: 'emp-004'
+        },
+        {
+          title: 'iPhone battery draining within 3 hours',
+          description: 'Company iPhone battery drains to 0% in under 3 hours with normal usage. Battery health shows 71% in settings.',
+          priority: 'MEDIUM', status: 'RESOLVED',
+          techNote: 'Battery health below 80% threshold — eligible for replacement.',
+          resolvedNote: 'Battery replaced at authorized Apple service center. Device returned to employee. New battery health: 100%.',
+          assetId: 'ast-009', employeeId: 'emp-005'
+        },
+        {
+          title: 'Mouse cursor jumping randomly',
+          description: 'Mouse.',
+          priority: 'LOW', status: 'REJECTED',
+          rejectionReason: 'Insufficient information provided. Please resubmit with: asset tag, operating system, and a detailed description of when the issue occurs.',
+          assetId: 'ast-018', employeeId: 'emp-007'
+        },
+      ]
+    });
+  }
+
+  // ── 11. AUDIT LOGS (Activity Chart Data) ──────────────────
+  const logCount = await prisma.auditLog.count();
+  if (logCount === 0) {
+    const today = new Date();
+    const d1 = new Date(today); d1.setDate(today.getDate() - 1);
+    const d2 = new Date(today); d2.setDate(today.getDate() - 2);
+    const d3 = new Date(today); d3.setDate(today.getDate() - 3);
+    const d4 = new Date(today); d4.setDate(today.getDate() - 4);
+    const d5 = new Date(today); d5.setDate(today.getDate() - 5);
+
+    await prisma.auditLog.createMany({
+      data: [
+        // ASSIGNS
+        { action: 'ASSIGN', performedBy: 'System', assetId: 'ast-001', timestamp: d1 },
+        { action: 'ASSIGN', performedBy: 'System', assetId: 'ast-002', timestamp: d1 },
+        { action: 'ASSIGN', performedBy: 'System', assetId: 'ast-003', timestamp: d2 },
+        { action: 'ASSIGN', performedBy: 'System', assetId: 'ast-006', timestamp: d3 },
+        { action: 'ASSIGN', performedBy: 'System', assetId: 'ast-009', timestamp: d4 },
+        { action: 'ASSIGN', performedBy: 'System', assetId: 'ast-010', timestamp: d4 },
+        { action: 'ASSIGN', performedBy: 'System', assetId: 'ast-012', timestamp: d5 },
+        // UNASSIGNS (Returns)
+        { action: 'UNASSIGN', performedBy: 'System', assetId: 'ast-004', timestamp: d1 },
+        { action: 'UNASSIGN', performedBy: 'System', assetId: 'ast-005', timestamp: d2 },
+        { action: 'UNASSIGN', performedBy: 'System', assetId: 'ast-007', timestamp: d3 },
+        { action: 'UNASSIGN', performedBy: 'System', assetId: 'ast-008', timestamp: d5 },
+        { action: 'UNASSIGN', performedBy: 'System', assetId: 'ast-011', timestamp: d5 },
+      ]
+    });
+  }
+
+  console.log('✅ Database seeded with Acme Technologies mock data.');
 }
 seedDatabase();
 
@@ -456,6 +745,24 @@ app.put('/api/assets/:id/assign', async (req, res) => {
     }
   });
   
+  // Fire email asynchronously (does not block the response)
+  const emailHtml = `
+    <h2>Asset Assignment Notification</h2>
+    <p>Hello ${employee.name},</p>
+    <p>A new asset has been assigned to you:</p>
+    <ul>
+      <li><strong>Asset Tag:</strong> ${asset.assetTag}</li>
+      <li><strong>Name:</strong> ${asset.name}</li>
+      <li><strong>Category:</strong> ${asset.category}</li>
+    </ul>
+    <p>Please log in to the ITAM portal to view more details.</p>
+  `;
+  emailService.sendNotificationEmail(
+    employee.email, 
+    "New Asset Assigned - ITAM", 
+    emailHtml
+  );
+
   res.json(updatedAsset);
 });
 
@@ -930,13 +1237,12 @@ app.get('/api/audit-logs', async (req, res) => {
 // POST /api/audit-logs
 app.post('/api/audit-logs', async (req, res) => {
   try {
-    const { action, entityType, entityId, userName, details } = req.body;
+    const { action, entityId, assetId, performedBy, details } = req.body;
     const newLog = await prisma.auditLog.create({
       data: {
         action,
-        entityType,
-        entityId,
-        userName,
+        assetId: assetId || entityId, // Fallback if someone sends entityId
+        performedBy: performedBy || "SystemAdmin",
         details
       }
     });
@@ -1007,7 +1313,132 @@ app.put('/api/assets/:id/status', async (req, res) => {
   res.json(updatedAsset);
 });
 
-const PORT = 8080;
-app.listen(PORT, () => {
-  console.log(`Node.js backend running on http://localhost:${PORT}`);
+// ==========================================
+// ISSUE TICKETING MODULE (Helpdesk)
+// ==========================================
+
+// 1. GET /api/issues - returns all tickets with asset & employee info
+app.get('/api/issues', async (req, res) => {
+  try {
+    const issues = await prisma.issueTicket.findMany({
+      include: { asset: true, employee: true },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(issues);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
+
+// 2. POST /api/issues - employee submits a new ticket
+app.post('/api/issues', async (req, res) => {
+  try {
+    const { title, description, priority, assetId, employeeId } = req.body;
+    const newIssue = await prisma.issueTicket.create({
+      data: { title, description, priority, assetId, employeeId },
+      include: { asset: true, employee: true }
+    });
+    res.status(201).json(newIssue);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 3. PATCH /api/issues/:id/accept - Admin accepts the ticket
+app.patch('/api/issues/:id/accept', async (req, res) => {
+  try {
+    const updated = await prisma.issueTicket.update({
+      where: { id: req.params.id },
+      data: { status: 'ACCEPTED' },
+      include: { asset: true, employee: true }
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 4. PATCH /api/issues/:id/reject - Admin rejects ticket with reason
+app.patch('/api/issues/:id/reject', async (req, res) => {
+  try {
+    const { rejectionReason } = req.body;
+    const updated = await prisma.issueTicket.update({
+      where: { id: req.params.id },
+      data: { status: 'REJECTED', rejectionReason },
+      include: { asset: true, employee: true }
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 5. PATCH /api/issues/:id/forward - Admin forwards ticket to tech team with a note
+app.patch('/api/issues/:id/forward', async (req, res) => {
+  try {
+    const { techNote } = req.body;
+    const updated = await prisma.issueTicket.update({
+      where: { id: req.params.id },
+      data: { status: 'ASSIGNED', techNote },
+      include: { asset: true, employee: true }
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 6. PATCH /api/issues/:id/progress - Tech team marks ticket as In Progress
+app.patch('/api/issues/:id/progress', async (req, res) => {
+  try {
+    const updated = await prisma.issueTicket.update({
+      where: { id: req.params.id },
+      data: { status: 'IN_PROGRESS' },
+      include: { asset: true, employee: true }
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 7. PATCH /api/issues/:id/resolve - Tech team resolves the ticket
+app.patch('/api/issues/:id/resolve', async (req, res) => {
+  try {
+    const { resolvedNote } = req.body;
+    const updated = await prisma.issueTicket.update({
+      where: { id: req.params.id },
+      data: { status: 'RESOLVED', resolvedNote },
+      include: { asset: true, employee: true }
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 8. PUT /api/issues/:id - generic update (kept for compatibility)
+app.put('/api/issues/:id', async (req, res) => {
+  try {
+    const updated = await prisma.issueTicket.update({
+      where: { id: req.params.id },
+      data: req.body
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 9. DELETE /api/issues/:id - Admin deletes a ticket
+app.delete('/api/issues/:id', async (req, res) => {
+  try {
+    await prisma.issueTicket.delete({ where: { id: req.params.id } });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`Node.js backend running on http://localhost:${PORT}`));
