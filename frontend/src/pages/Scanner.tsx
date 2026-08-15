@@ -56,35 +56,35 @@ const Scanner = () => {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">QR Scanner</h1>
-          <p className="mt-1 text-sm text-slate-500">Scan an asset's QR code to view its details instantly.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">QR Scanner</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Scan an asset's QR code to view its details instantly.</p>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 min-h-[400px]">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 min-h-[400px]">
         {isScanning ? (
           <div className="max-w-md mx-auto">
-            <div id="reader" className="overflow-hidden rounded-xl border-2 border-indigo-100"></div>
-            <p className="text-center text-slate-500 mt-4 text-sm">Please grant camera permissions to scan.</p>
+            <div id="reader" className="overflow-hidden rounded-xl border-2 border-indigo-100 dark:border-indigo-500/30"></div>
+            <p className="text-center text-slate-500 dark:text-slate-400 mt-4 text-sm">Please grant camera permissions to scan.</p>
           </div>
         ) : (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto text-center space-y-6">
             
             {matchedAsset ? (
-              <div className="bg-slate-50 rounded-xl p-8 border border-slate-100 text-left">
-                <div className="flex items-center space-x-4 mb-6 pb-6 border-b border-slate-200">
-                  <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
+              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-8 border border-slate-100 dark:border-slate-700 text-left">
+                <div className="flex items-center space-x-4 mb-6 pb-6 border-b border-slate-200 dark:border-slate-700">
+                  <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center justify-center">
                     {getCategoryIcon(matchedAsset.category)}
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900">{matchedAsset.name}</h2>
-                    <p className="text-slate-500">{matchedAsset.assetTag}</p>
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">{matchedAsset.name}</h2>
+                    <p className="text-slate-500 dark:text-slate-400">{matchedAsset.assetTag}</p>
                   </div>
                   <div className="ml-auto">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      matchedAsset.status === 'AVAILABLE' ? 'bg-emerald-100 text-emerald-800' :
-                      matchedAsset.status === 'ASSIGNED' ? 'bg-blue-100 text-blue-800' :
-                      'bg-amber-100 text-amber-800'
+                      matchedAsset.status === 'AVAILABLE' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300' :
+                      matchedAsset.status === 'ASSIGNED' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300' :
+                      'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300'
                     }`}>
                       {matchedAsset.status}
                     </span>
@@ -93,28 +93,28 @@ const Scanner = () => {
 
                 <div className="grid grid-cols-2 gap-6 text-sm">
                   <div>
-                    <p className="text-slate-500 mb-1">Serial Number</p>
-                    <p className="font-medium text-slate-900">{matchedAsset.serialNumber}</p>
+                    <p className="text-slate-500 dark:text-slate-400 mb-1">Serial Number</p>
+                    <p className="font-medium text-slate-900 dark:text-white">{matchedAsset.serialNumber}</p>
                   </div>
                   <div>
-                    <p className="text-slate-500 mb-1">Vendor</p>
-                    <p className="font-medium text-slate-900">{matchedAsset.vendor}</p>
+                    <p className="text-slate-500 dark:text-slate-400 mb-1">Vendor</p>
+                    <p className="font-medium text-slate-900 dark:text-white">{matchedAsset.vendor}</p>
                   </div>
                   <div>
-                    <p className="text-slate-500 mb-1">Purchase Date</p>
-                    <p className="font-medium text-slate-900">{new Date(matchedAsset.purchaseDate).toLocaleDateString()}</p>
+                    <p className="text-slate-500 dark:text-slate-400 mb-1">Purchase Date</p>
+                    <p className="font-medium text-slate-900 dark:text-white">{new Date(matchedAsset.purchaseDate).toLocaleDateString()}</p>
                   </div>
                   <div>
-                    <p className="text-slate-500 mb-1">Location</p>
-                    <p className="font-medium text-slate-900">{matchedAsset.location || 'N/A'}</p>
+                    <p className="text-slate-500 dark:text-slate-400 mb-1">Location</p>
+                    <p className="font-medium text-slate-900 dark:text-white">{matchedAsset.location || 'N/A'}</p>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="py-12">
                 <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-                <h2 className="text-xl font-bold text-slate-900">Asset Not Found</h2>
-                <p className="text-slate-500 mt-2">The scanned QR code ({scanResult}) did not match any active asset in the system.</p>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Asset Not Found</h2>
+                <p className="text-slate-500 dark:text-slate-400 mt-2">The scanned QR code ({scanResult}) did not match any active asset in the system.</p>
               </div>
             )}
 

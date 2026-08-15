@@ -56,15 +56,15 @@ export default function AuditLogs() {
   const getActionBadge = (action: string) => {
     switch (action) {
       case 'CREATE':
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">CREATE</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300">CREATE</span>;
       case 'UPDATE':
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">UPDATE</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300">UPDATE</span>;
       case 'DELETE':
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">DELETE</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-500/20 text-red-800 dark:text-red-300">DELETE</span>;
       case 'LOGIN':
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">LOGIN</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300">LOGIN</span>;
       default:
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">{action}</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100">{action}</span>;
     }
   };
 
@@ -106,11 +106,11 @@ export default function AuditLogs() {
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight flex items-center">
-            <ShieldAlert className="w-6 h-6 mr-2 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight flex items-center">
+            <ShieldAlert className="w-6 h-6 mr-2 text-indigo-600 dark:text-indigo-400" />
             Immutable Audit Ledger
           </h1>
-          <p className="text-sm text-slate-500 mt-1">Read-only historical tracking of all system activity</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Read-only historical tracking of all system activity</p>
         </div>
         
         <div className="flex items-center space-x-3 w-full sm:w-auto">
@@ -121,7 +121,7 @@ export default function AuditLogs() {
               placeholder="Search user, entity, details..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
             />
           </div>
           <div className="relative">
@@ -129,7 +129,7 @@ export default function AuditLogs() {
             <select
               value={filterAction}
               onChange={(e) => setFilterAction(e.target.value)}
-              className="pl-9 pr-8 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none bg-white"
+              className="pl-9 pr-8 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none bg-white dark:bg-slate-900"
             >
               <option value="ALL">All Actions</option>
               <option value="CREATE">Creates</option>
@@ -149,28 +149,28 @@ export default function AuditLogs() {
         </div>
       </div>
 
-      <motion.div variants={itemVariants} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-100">
-            <thead className="bg-slate-50/50">
+          <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
+            <thead className="bg-slate-50/50 dark:bg-slate-900/50">
               <tr>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Timestamp</th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">User</th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Entity</th>
-                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Details</th>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Timestamp</th>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Action</th>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">User</th>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Entity</th>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Details</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-slate-100">
+            <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-700">
               {filteredLogs.map((log: any) => (
                 <motion.tr 
                   key={log.id} 
-                  className="hover:bg-slate-50/50 transition-colors"
+                  className="hover:bg-slate-50/50 dark:bg-slate-900/50 transition-colors"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center text-sm text-slate-500">
+                    <div className="flex items-center text-sm text-slate-500 dark:text-slate-400">
                       <Clock className="w-4 h-4 mr-1.5 text-slate-400" />
                       {new Date(log.timestamp).toLocaleString()}
                     </div>
@@ -180,23 +180,23 @@ export default function AuditLogs() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center">
-                        <span className="text-xs font-bold text-indigo-700">{(log.performedBy || log.userName || "?").charAt(0)}</span>
+                      <div className="flex-shrink-0 h-6 w-6 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center">
+                        <span className="text-xs font-bold text-indigo-700 dark:text-indigo-400">{(log.performedBy || log.userName || "?").charAt(0)}</span>
                       </div>
                       <div className="ml-3">
-                        <div className="text-sm font-medium text-slate-900">{log.performedBy || log.userName || "Unknown User"}</div>
+                        <div className="text-sm font-medium text-slate-900 dark:text-white">{log.performedBy || log.userName || "Unknown User"}</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center text-sm text-slate-900 font-medium">
+                    <div className="flex items-center text-sm text-slate-900 dark:text-white font-medium">
                       {getEntityIcon('asset')}
                       <span className="ml-2">Asset</span>
                       {log.assetId && <span className="ml-1 text-slate-400 font-normal">#{log.assetId.slice(0,8)}</span>}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-slate-500 max-w-md truncate" title={log.details}>
+                    <div className="text-sm text-slate-500 dark:text-slate-400 max-w-md truncate" title={log.details}>
                       {log.details || "-"}
                     </div>
                   </td>
@@ -208,8 +208,8 @@ export default function AuditLogs() {
           {filteredLogs.length === 0 && (
             <div className="py-12 text-center">
               <Activity className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-900">No logs found</h3>
-              <p className="text-slate-500 mt-1">
+              <h3 className="text-lg font-medium text-slate-900 dark:text-white">No logs found</h3>
+              <p className="text-slate-500 dark:text-slate-400 mt-1">
                 {logs.length === 0 ? "The audit ledger is currently empty." : "No logs match your search/filter criteria."}
               </p>
             </div>

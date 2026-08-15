@@ -74,7 +74,7 @@ export default function PortalLanding() {
           </div>
           <div>
             <span className="text-white font-bold text-lg tracking-tight">ITAMS Core</span>
-            <span className="ml-2 text-xs text-slate-500 font-medium">Enterprise</span>
+            <span className="ml-2 text-xs text-slate-500 dark:text-slate-400 font-medium">Enterprise</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -159,7 +159,7 @@ export default function PortalLanding() {
       </div>
 
       {/* Footer */}
-      <div className="relative z-10 text-center pb-8 text-xs text-slate-600">
+      <div className="relative z-10 text-center pb-8 text-xs text-slate-600 dark:text-slate-300">
         © 2025 Acme Technologies Inc. · ITAMS Core v2.0 · All rights reserved.
       </div>
     </div>

@@ -76,11 +76,15 @@ class GlobalErrorBoundary extends Component<{ children: React.ReactNode }, { has
   }
 }
 
+import { Toaster } from 'react-hot-toast';
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 function App() {
   return (
-    <Router>
-      <Routes>
+    <>
+      <Toaster position="bottom-right" />
+      <Router>
+        <Routes>
         {/* ── Public Routes ── */}
         <Route path="/portal"       element={<PortalLanding />} />
         <Route path="/login/admin"  element={<LoginAdmin />} />
@@ -106,6 +110,7 @@ function App() {
         <Route path="/settings"        element={<ProtectedRoute path="/settings">       <SettingsPage />            </ProtectedRoute>} />
       </Routes>
     </Router>
+    </>
   );
 }
 

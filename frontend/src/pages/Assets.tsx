@@ -4,7 +4,9 @@ import { fetchAssets, createAsset, updateAsset, checkOutAsset, checkInAsset, fet
 import { fetchEmployees } from "../api/employeeApi";
 import { useAuthStore } from "../store/authStore";
 import { QRCodeSVG } from "qrcode.react";
-import { Plus, Search, Filter, Monitor, Laptop, Smartphone, Server, X, Printer, Download, Upload } from "lucide-react";
+import { Plus, Search, Filter, Monitor, Laptop, Smartphone, Server, X, Printer, Download, Upload, MoreVertical } from "lucide-react";
+import { motion } from "framer-motion";
+import { toast } from "react-hot-toast";
 
 export default function Assets() {
   const { userRole } = useAuthStore();
@@ -25,7 +27,7 @@ export default function Assets() {
   const [assetLogs, setAssetLogs] = useState<any[]>([]);
   const [assetMaintenance, setAssetMaintenance] = useState<any[]>([]);
   const [assetDocuments, setAssetDocuments] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'DETAILS' | 'MAINTENANCE' | 'DOCUMENTS'>('DETAILS');
+  const [activeTab, setActiveTab] = useState<'DETAILS' | 'MAINTENANCE' | 'DOCUMENTS' | 'LIFECYCLE'>('DETAILS');
   const [newRepair, setNewRepair] = useState({ issueDescription: "", cost: "" });
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -125,7 +127,7 @@ export default function Assets() {
       const docs = await fetchAssetDocuments(viewAsset.id);
       setAssetDocuments(docs);
     } catch (error) {
-      alert("Failed to upload document");
+      toast.error("Failed to upload document");
     } finally {
       setUploadingDoc(false);
       if (e.target) e.target.value = '';
@@ -225,7 +227,7 @@ export default function Assets() {
       await checkInAsset(assetId);
       loadAssets();
     } catch (error: any) {
-      alert(error.message || "Failed to check in asset");
+      toast.error(error.message || "Failed to check in asset");
     }
   };
 

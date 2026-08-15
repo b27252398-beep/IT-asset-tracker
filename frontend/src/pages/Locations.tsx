@@ -100,8 +100,8 @@ export default function Locations() {
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Facilities & Locations</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage office branches and warehouses</p>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Facilities & Locations</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage office branches and warehouses</p>
         </div>
         
         <div className="flex items-center space-x-3 w-full sm:w-auto">
@@ -110,7 +110,7 @@ export default function Locations() {
             <input 
               type="text" 
               placeholder="Search facilities..." 
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
             />
           </div>
           <button 
@@ -128,26 +128,26 @@ export default function Locations() {
           <motion.div 
             key={loc.id} 
             variants={itemVariants}
-            className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow relative"
+            className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden hover:shadow-md transition-shadow relative"
           >
             <div className="absolute top-4 right-4">
               {loc.status === 'ACTIVE' ? (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300">
                   <Activity className="w-3 h-3 mr-1" /> Active
                 </span>
               ) : (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100">
                   <ShieldOff className="w-3 h-3 mr-1" /> Inactive
                 </span>
               )}
             </div>
             
             <div className="p-6">
-              <div className="flex items-center justify-center w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl mb-4">
+              <div className="flex items-center justify-center w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl mb-4">
                 <Building className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-1">{loc.name}</h3>
-              <div className="flex items-start text-sm text-slate-500 mt-2">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">{loc.name}</h3>
+              <div className="flex items-start text-sm text-slate-500 dark:text-slate-400 mt-2">
                 <MapPin className="w-4 h-4 mr-1.5 flex-shrink-0 mt-0.5" />
                 <span>
                   {loc.address ? `${loc.address}, ` : ''}
@@ -157,19 +157,19 @@ export default function Locations() {
               </div>
             </div>
             
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end space-x-2">
+            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700 flex justify-end space-x-2">
               <button 
                 onClick={() => {
                   setEditLoc(loc);
                   setIsEditModalOpen(true);
                 }}
-                className="text-slate-600 hover:text-indigo-600 p-2 hover:bg-white rounded-lg transition-colors flex items-center text-sm font-medium"
+                className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:text-indigo-400 p-2 hover:bg-white dark:bg-slate-900 rounded-lg transition-colors flex items-center text-sm font-medium"
               >
                 <Edit2 className="w-4 h-4 mr-1.5" /> Edit
               </button>
               <button 
                 onClick={() => handleDelete(loc.id)}
-                className="text-slate-600 hover:text-red-600 p-2 hover:bg-white rounded-lg transition-colors flex items-center text-sm font-medium"
+                className="text-slate-600 dark:text-slate-300 hover:text-red-600 dark:text-red-400 p-2 hover:bg-white dark:bg-slate-900 rounded-lg transition-colors flex items-center text-sm font-medium"
               >
                 <Trash2 className="w-4 h-4 mr-1.5" /> Delete
               </button>
@@ -178,13 +178,13 @@ export default function Locations() {
         ))}
         
         {locations.length === 0 && (
-          <div className="col-span-full py-12 text-center bg-white rounded-2xl border border-dashed border-slate-300">
+          <div className="col-span-full py-12 text-center bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300">
             <Building className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900">No Facilities Configured</h3>
-            <p className="text-slate-500 mt-1">Add your first location to start organizing physical boundaries.</p>
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white">No Facilities Configured</h3>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Add your first location to start organizing physical boundaries.</p>
             <button 
               onClick={() => setIsAddModalOpen(true)}
-              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 focus:outline-none"
+              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:bg-indigo-500/20 focus:outline-none"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Facility
@@ -199,42 +199,42 @@ export default function Locations() {
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onClick={() => setIsAddModalOpen(false)}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className="relative z-10 inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div className="relative z-10 inline-block align-bottom bg-white dark:bg-slate-900 rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100 dark:border-slate-700">
+              <div className="bg-white dark:bg-slate-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
-                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <MapPin className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-500/20 sm:mx-0 sm:h-10 sm:w-10">
+                    <MapPin className="h-5 w-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                   </div>
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                    <h3 className="text-lg leading-6 font-semibold text-slate-900" id="modal-title">Add New Facility</h3>
+                    <h3 className="text-lg leading-6 font-semibold text-slate-900 dark:text-white" id="modal-title">Add New Facility</h3>
                     <form onSubmit={handleAddSubmit} className="mt-6 space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-700">Facility Name *</label>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Facility Name *</label>
                         <input type="text" required value={newLoc.name} onChange={e => setNewLoc({...newLoc, name: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. HQ - New York" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700">Street Address</label>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Street Address</label>
                         <input type="text" value={newLoc.address} onChange={e => setNewLoc({...newLoc, address: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="123 Corporate Blvd" />
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div className="col-span-1">
-                          <label className="block text-sm font-medium text-slate-700">City</label>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">City</label>
                           <input type="text" value={newLoc.city} onChange={e => setNewLoc({...newLoc, city: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
                         </div>
                         <div className="col-span-1">
-                          <label className="block text-sm font-medium text-slate-700">State/Region</label>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">State/Region</label>
                           <input type="text" value={newLoc.state} onChange={e => setNewLoc({...newLoc, state: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
                         </div>
                         <div className="col-span-1">
-                          <label className="block text-sm font-medium text-slate-700">ZIP</label>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">ZIP</label>
                           <input type="text" value={newLoc.zip} onChange={e => setNewLoc({...newLoc, zip: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
                         </div>
                       </div>
-                      <div className="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100">
+                      <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-700">
                         <button type="submit" disabled={createMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {createMutation.isPending ? 'Saving...' : 'Add Facility'}
                         </button>
-                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>
@@ -253,49 +253,49 @@ export default function Locations() {
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onClick={() => setIsEditModalOpen(false)}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className="relative z-10 inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div className="relative z-10 inline-block align-bottom bg-white dark:bg-slate-900 rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100 dark:border-slate-700">
+              <div className="bg-white dark:bg-slate-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
-                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <Edit2 className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-500/20 sm:mx-0 sm:h-10 sm:w-10">
+                    <Edit2 className="h-5 w-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                   </div>
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                    <h3 className="text-lg leading-6 font-semibold text-slate-900" id="modal-title">Edit Facility</h3>
+                    <h3 className="text-lg leading-6 font-semibold text-slate-900 dark:text-white" id="modal-title">Edit Facility</h3>
                     <form onSubmit={handleEditSubmit} className="mt-6 space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-700">Facility Name *</label>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Facility Name *</label>
                         <input type="text" required value={editLoc.name} onChange={e => setEditLoc({...editLoc, name: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700">Street Address</label>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Street Address</label>
                         <input type="text" value={editLoc.address || ""} onChange={e => setEditLoc({...editLoc, address: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div className="col-span-1">
-                          <label className="block text-sm font-medium text-slate-700">City</label>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">City</label>
                           <input type="text" value={editLoc.city || ""} onChange={e => setEditLoc({...editLoc, city: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
                         </div>
                         <div className="col-span-1">
-                          <label className="block text-sm font-medium text-slate-700">State/Region</label>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">State/Region</label>
                           <input type="text" value={editLoc.state || ""} onChange={e => setEditLoc({...editLoc, state: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
                         </div>
                         <div className="col-span-1">
-                          <label className="block text-sm font-medium text-slate-700">ZIP</label>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">ZIP</label>
                           <input type="text" value={editLoc.zip || ""} onChange={e => setEditLoc({...editLoc, zip: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-slate-700">Status</label>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Status</label>
                         <select value={editLoc.status} onChange={e => setEditLoc({...editLoc, status: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                           <option value="ACTIVE">Active</option>
                           <option value="INACTIVE">Inactive</option>
                         </select>
                       </div>
-                      <div className="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100">
+                      <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-700">
                         <button type="submit" disabled={updateMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                         </button>
-                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>
