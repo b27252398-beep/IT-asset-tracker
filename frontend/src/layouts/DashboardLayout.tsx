@@ -13,7 +13,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
-  const { userRole, setRole } = useAuthStore();
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'Low Stock Alert', desc: 'Printer Ink (Black) is below minimum threshold (3 remaining).', time: '10 minutes ago' },
+    { id: 2, title: 'New Ticket Assigned', desc: 'Ticket #ISS-4092 has been assigned to your queue.', time: '2 hours ago' }
+  ]);
+  const { user, userRole, setRole } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
 
   // Define which roles can see each module
@@ -69,32 +73,34 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           })}
         </nav>
         
-        {/* Role Switcher for Testing */}
-        <div className="px-4 py-4">
-          <div className="bg-slate-800 rounded-lg p-3">
-            <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold mb-2 uppercase tracking-wider">Test RBAC</p>
-            <div className="flex rounded-md p-1 bg-slate-900 border border-slate-700 gap-0.5">
-              <button 
-                onClick={() => setRole('ADMIN')}
-                className={`flex-1 text-xs py-1.5 rounded font-medium transition-colors cursor-pointer ${userRole === 'ADMIN' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 dark:text-slate-500 hover:text-slate-300'}`}
-              >
-                Admin
-              </button>
-              <button 
-                onClick={() => setRole('EMPLOYEE')}
-                className={`flex-1 text-xs py-1.5 rounded font-medium transition-colors cursor-pointer ${userRole === 'EMPLOYEE' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 dark:text-slate-500 hover:text-slate-300'}`}
-              >
-                Staff
-              </button>
-              <button 
-                onClick={() => setRole('TECH_TEAM')}
-                className={`flex-1 text-xs py-1.5 rounded font-medium transition-colors cursor-pointer ${userRole === 'TECH_TEAM' ? 'bg-emerald-600 text-white shadow' : 'text-slate-400 dark:text-slate-500 hover:text-slate-300'}`}
-              >
-                Tech
-              </button>
+        {/* Role Switcher for Admin Testing */}
+        {user?.role === 'ADMIN' && (
+          <div className="px-4 py-4">
+            <div className="bg-slate-800 rounded-lg p-3">
+              <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold mb-2 uppercase tracking-wider">Test RBAC</p>
+              <div className="flex rounded-md p-1 bg-slate-900 border border-slate-700 gap-0.5">
+                <button 
+                  onClick={() => setRole('ADMIN')}
+                  className={`flex-1 text-xs py-1.5 rounded font-medium transition-colors cursor-pointer ${userRole === 'ADMIN' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 dark:text-slate-500 hover:text-slate-300'}`}
+                >
+                  Admin
+                </button>
+                <button 
+                  onClick={() => setRole('EMPLOYEE')}
+                  className={`flex-1 text-xs py-1.5 rounded font-medium transition-colors cursor-pointer ${userRole === 'EMPLOYEE' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 dark:text-slate-500 hover:text-slate-300'}`}
+                >
+                  Staff
+                </button>
+                <button 
+                  onClick={() => setRole('TECH_TEAM')}
+                  className={`flex-1 text-xs py-1.5 rounded font-medium transition-colors cursor-pointer ${userRole === 'TECH_TEAM' ? 'bg-emerald-600 text-white shadow' : 'text-slate-400 dark:text-slate-500 hover:text-slate-300'}`}
+                >
+                  Tech
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="p-4 border-t border-slate-800">
           <div 
@@ -141,30 +147,43 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-400 relative cursor-pointer"
               >
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+                {notifications.length > 0 && (
+                  <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+                )}
               </button>
               
               {showNotifications && (
                 <div className="absolute right-0 top-12 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50">
                   <div className="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 dark:bg-slate-900 flex justify-between items-center">
                     <h3 className="font-semibold text-slate-800 dark:text-slate-100 dark:text-white">Notifications</h3>
-                    <span className="text-xs bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 dark:bg-indigo-500/20 dark:text-indigo-400 px-2 py-0.5 rounded-full font-medium">2 New</span>
+                    <span className="text-xs bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full font-medium">{notifications.length} New</span>
                   </div>
                   <div className="divide-y divide-slate-100 dark:divide-slate-700">
-                    <div className="p-4 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors">
-                      <p className="text-sm font-medium text-slate-800 dark:text-slate-100 dark:text-white">Low Stock Alert</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">Printer Ink (Black) is below minimum threshold (3 remaining).</p>
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2">10 minutes ago</p>
-                    </div>
-                    <div className="p-4 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors">
-                      <p className="text-sm font-medium text-slate-800 dark:text-slate-100 dark:text-white">New Ticket Assigned</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">Ticket #ISS-4092 has been assigned to your queue.</p>
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2">2 hours ago</p>
-                    </div>
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-center text-sm text-slate-500 dark:text-slate-400">No new notifications</div>
+                    ) : (
+                      notifications.map(n => (
+                        <div key={n.id} className="p-4 hover:bg-slate-50 dark:bg-slate-900/50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors">
+                          <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{n.title}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{n.desc}</p>
+                          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2">{n.time}</p>
+                        </div>
+                      ))
+                    )}
                   </div>
-                  <div className="p-3 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 dark:bg-slate-900 text-center">
-                    <button className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:text-indigo-300 dark:hover:text-indigo-300">Mark all as read</button>
-                  </div>
+                  {notifications.length > 0 && (
+                    <div className="p-3 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-center">
+                      <button 
+                        onClick={() => {
+                          setNotifications([]);
+                          setTimeout(() => setShowNotifications(false), 800);
+                        }} 
+                        className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 cursor-pointer"
+                      >
+                        Mark all as read
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

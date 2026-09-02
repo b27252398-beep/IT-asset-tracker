@@ -1,8 +1,13 @@
 import { Shield, Bell, Key, Database, Globe } from "lucide-react";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("General");
+  const [emailNotif, setEmailNotif] = useState(true);
+  const [warrantyAlert, setWarrantyAlert] = useState(true);
+  const [twoFactor, setTwoFactor] = useState(false);
+  const [autoBackup, setAutoBackup] = useState(true);
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div>
@@ -72,8 +77,8 @@ export default function Settings() {
                       <h4 className="text-sm font-medium text-slate-900 dark:text-white">Email Notifications</h4>
                       <p className="text-sm text-slate-500 dark:text-slate-400">Receive alerts when new issues are reported or assets are assigned.</p>
                     </div>
-                    <button className="bg-indigo-600 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                      <span className="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                    <button onClick={() => setEmailNotif(!emailNotif)} className={`${emailNotif ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}>
+                      <span className={`${emailNotif ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}></span>
                     </button>
                   </div>
 
@@ -82,8 +87,8 @@ export default function Settings() {
                       <h4 className="text-sm font-medium text-slate-900 dark:text-white">Warranty Expiry Alerts</h4>
                       <p className="text-sm text-slate-500 dark:text-slate-400">Send an email digest 30 days before asset warranties expire.</p>
                     </div>
-                    <button className="bg-indigo-600 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                      <span className="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                    <button onClick={() => setWarrantyAlert(!warrantyAlert)} className={`${warrantyAlert ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}>
+                      <span className={`${warrantyAlert ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}></span>
                     </button>
                   </div>
 
@@ -102,8 +107,8 @@ export default function Settings() {
                       <h4 className="text-sm font-medium text-slate-900 dark:text-white">Two-Factor Authentication (2FA)</h4>
                       <p className="text-sm text-slate-500 dark:text-slate-400">Require all users to use 2FA when logging in.</p>
                     </div>
-                    <button className="bg-slate-200 dark:bg-slate-700 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none">
-                      <span className="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                    <button onClick={() => setTwoFactor(!twoFactor)} className={`${twoFactor ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}>
+                      <span className={`${twoFactor ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}></span>
                     </button>
                   </div>
                   <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -117,10 +122,10 @@ export default function Settings() {
                     <h4 className="text-sm font-medium text-slate-900 dark:text-white mb-2">Active API Keys</h4>
                     <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-md border border-slate-200 dark:border-slate-700 font-mono text-sm break-all text-slate-600 dark:text-slate-300 flex justify-between items-center">
                       <span>sk_live_9f8d7b6a5c4e3d2f1a0b...</span>
-                      <span className="text-xs text-indigo-600 dark:text-indigo-400 cursor-pointer hover:underline">Copy</span>
+                      <span onClick={() => toast.success("API key copied to clipboard!")} className="text-xs text-indigo-600 dark:text-indigo-400 cursor-pointer hover:underline">Copy</span>
                     </div>
                   </div>
-                  <button className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none cursor-pointer">
+                  <button onClick={() => toast.success("New API key generated!")} className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none cursor-pointer">
                     Generate New Key
                   </button>
                 </div>
@@ -135,8 +140,8 @@ export default function Settings() {
                       <h4 className="text-sm font-medium text-slate-900 dark:text-white">Enable Automated Backups</h4>
                       <p className="text-sm text-slate-500 dark:text-slate-400">Run database backups daily at 2:00 AM UTC.</p>
                     </div>
-                    <button className="bg-indigo-600 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none">
-                      <span className="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                    <button onClick={() => setAutoBackup(!autoBackup)} className={`${autoBackup ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'} relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}>
+                      <span className={`${autoBackup ? 'translate-x-5' : 'translate-x-0'} pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}></span>
                     </button>
                   </div>
                 </div>
@@ -144,13 +149,13 @@ export default function Settings() {
 
               <div className="pt-4 flex justify-end">
                 <button 
-                  onClick={() => console.log("Settings change cancelled.")}
-                  className="bg-white dark:bg-slate-900 py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3 cursor-pointer"
+                  onClick={() => toast.error("Changes discarded.")}
+                  className="bg-white dark:bg-slate-900 py-2 px-4 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button 
-                  onClick={() => console.log("Settings successfully saved!")}
+                  onClick={() => toast.success("Settings successfully saved!")}
                   className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
                 >
                   Save Changes

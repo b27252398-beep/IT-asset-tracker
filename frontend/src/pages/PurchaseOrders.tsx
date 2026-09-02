@@ -24,6 +24,7 @@ const itemVariants = {
 };
 
 export default function PurchaseOrders() {
+  const [searchTerm, setSearchTerm] = useState('');
   const queryClient = useQueryClient();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -131,8 +132,8 @@ export default function PurchaseOrders() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input 
               type="text" 
-              placeholder="Search POs..." 
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+              placeholder="Search POs..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} 
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
           <button 
@@ -148,7 +149,7 @@ export default function PurchaseOrders() {
       <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
-            <thead className="bg-slate-50/50 dark:bg-slate-900/50">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-900/50">
               <tr>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">PO Number</th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Vendor</th>
@@ -159,10 +160,10 @@ export default function PurchaseOrders() {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-700">
-              {pos.map((po: any) => (
+              {pos.filter((searchItem: any) => Object.values(searchItem || {}).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()))).map((po: any) => (
                 <motion.tr 
                   key={po.id} 
-                  className="hover:bg-slate-50/50 dark:bg-slate-900/50 transition-colors"
+                  className="hover:bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-900/50 transition-colors"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
@@ -237,27 +238,27 @@ export default function PurchaseOrders() {
                     <form onSubmit={handleAddSubmit} className="mt-6 space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">PO Number</label>
-                        <input type="text" required value={newPO.poNumber} onChange={e => setNewPO({...newPO, poNumber: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="PO-2023-001" />
+                        <input type="text" required value={newPO.poNumber} onChange={e => setNewPO({...newPO, poNumber: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="PO-2023-001" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Vendor Name</label>
-                        <input type="text" required value={newPO.vendorName} onChange={e => setNewPO({...newPO, vendorName: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Dell Inc." />
+                        <input type="text" required value={newPO.vendorName} onChange={e => setNewPO({...newPO, vendorName: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="e.g. Dell Inc." />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Order Date</label>
-                          <input type="date" required value={newPO.orderDate} onChange={e => setNewPO({...newPO, orderDate: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="date" required value={newPO.orderDate} onChange={e => setNewPO({...newPO, orderDate: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Total Amount ($)</label>
-                          <input type="number" step="0.01" min="0" required value={newPO.totalAmount} onChange={e => setNewPO({...newPO, totalAmount: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="0.00" />
+                          <input type="number" step="0.01" min="0" required value={newPO.totalAmount} onChange={e => setNewPO({...newPO, totalAmount: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="0.00" />
                         </div>
                       </div>
                       <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-700">
                         <button type="submit" disabled={createMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {createMutation.isPending ? 'Saving...' : 'Create PO'}
                         </button>
-                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>
@@ -287,25 +288,25 @@ export default function PurchaseOrders() {
                     <form onSubmit={handleEditSubmit} className="mt-6 space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">PO Number</label>
-                        <input type="text" required value={editPO.poNumber} onChange={e => setEditPO({...editPO, poNumber: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                        <input type="text" required value={editPO.poNumber} onChange={e => setEditPO({...editPO, poNumber: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Vendor Name</label>
-                        <input type="text" required value={editPO.vendorName} onChange={e => setEditPO({...editPO, vendorName: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                        <input type="text" required value={editPO.vendorName} onChange={e => setEditPO({...editPO, vendorName: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Order Date</label>
-                          <input type="date" required value={editPO.orderDate ? editPO.orderDate.split('T')[0] : ""} onChange={e => setEditPO({...editPO, orderDate: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="date" required value={editPO.orderDate ? editPO.orderDate.split('T')[0] : ""} onChange={e => setEditPO({...editPO, orderDate: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Total Amount ($)</label>
-                          <input type="number" step="0.01" min="0" required value={editPO.totalAmount} onChange={e => setEditPO({...editPO, totalAmount: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="number" step="0.01" min="0" required value={editPO.totalAmount} onChange={e => setEditPO({...editPO, totalAmount: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Status</label>
-                        <select value={editPO.status} onChange={e => setEditPO({...editPO, status: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <select value={editPO.status} onChange={e => setEditPO({...editPO, status: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                           <option value="PENDING">Pending</option>
                           <option value="APPROVED">Approved</option>
                           <option value="DELIVERED">Delivered</option>
@@ -316,7 +317,7 @@ export default function PurchaseOrders() {
                         <button type="submit" disabled={updateMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                         </button>
-                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>

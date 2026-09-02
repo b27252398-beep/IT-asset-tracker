@@ -24,6 +24,7 @@ const itemVariants = {
 };
 
 export default function Software() {
+  const [searchTerm, setSearchTerm] = useState('');
   const queryClient = useQueryClient();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -127,8 +128,8 @@ export default function Software() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input 
               type="text" 
-              placeholder="Search software..." 
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+              placeholder="Search software..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} 
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
           <button 
@@ -144,7 +145,7 @@ export default function Software() {
       <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
-            <thead className="bg-slate-50/50 dark:bg-slate-900/50">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-900/50">
               <tr>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Software</th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">License Key</th>
@@ -161,7 +162,7 @@ export default function Software() {
                 return (
                   <motion.tr 
                     key={license.id} 
-                    className="hover:bg-slate-50/50 dark:bg-slate-900/50 transition-colors"
+                    className="hover:bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-900/50 transition-colors"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
@@ -251,31 +252,31 @@ export default function Software() {
                     <form onSubmit={handleAddSubmit} className="mt-6 space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Software Name</label>
-                        <input type="text" required value={newLicense.name} onChange={e => setNewLicense({...newLicense, name: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Adobe Creative Cloud" />
+                        <input type="text" required value={newLicense.name} onChange={e => setNewLicense({...newLicense, name: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="e.g. Adobe Creative Cloud" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Publisher</label>
-                        <input type="text" required value={newLicense.publisher} onChange={e => setNewLicense({...newLicense, publisher: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Adobe" />
+                        <input type="text" required value={newLicense.publisher} onChange={e => setNewLicense({...newLicense, publisher: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="e.g. Adobe" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">License Key</label>
-                        <input type="text" value={newLicense.licenseKey} onChange={e => setNewLicense({...newLicense, licenseKey: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="XXXX-XXXX-XXXX-XXXX" />
+                        <input type="text" value={newLicense.licenseKey} onChange={e => setNewLicense({...newLicense, licenseKey: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="XXXX-XXXX-XXXX-XXXX" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Total Seats</label>
-                          <input type="number" min="1" required value={newLicense.seatsTotal} onChange={e => setNewLicense({...newLicense, seatsTotal: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="number" min="1" required value={newLicense.seatsTotal} onChange={e => setNewLicense({...newLicense, seatsTotal: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Expiry Date</label>
-                          <input type="date" value={newLicense.expiryDate} onChange={e => setNewLicense({...newLicense, expiryDate: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="date" value={newLicense.expiryDate} onChange={e => setNewLicense({...newLicense, expiryDate: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                       </div>
                       <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-700">
                         <button type="submit" disabled={createMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {createMutation.isPending ? 'Saving...' : 'Add License'}
                         </button>
-                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>
@@ -305,32 +306,32 @@ export default function Software() {
                     <form onSubmit={handleEditSubmit} className="mt-6 space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Software Name</label>
-                        <input type="text" required value={editLicense.name} onChange={e => setEditLicense({...editLicense, name: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                        <input type="text" required value={editLicense.name} onChange={e => setEditLicense({...editLicense, name: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Publisher</label>
-                        <input type="text" required value={editLicense.publisher} onChange={e => setEditLicense({...editLicense, publisher: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                        <input type="text" required value={editLicense.publisher} onChange={e => setEditLicense({...editLicense, publisher: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">License Key</label>
-                        <input type="text" value={editLicense.licenseKey || ''} onChange={e => setEditLicense({...editLicense, licenseKey: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                        <input type="text" value={editLicense.licenseKey || ''} onChange={e => setEditLicense({...editLicense, licenseKey: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Total Seats</label>
-                          <input type="number" min="1" required value={editLicense.seatsTotal} onChange={e => setEditLicense({...editLicense, seatsTotal: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="number" min="1" required value={editLicense.seatsTotal} onChange={e => setEditLicense({...editLicense, seatsTotal: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Allocated Seats</label>
-                          <input type="number" min="0" required value={editLicense.seatsAllocated} onChange={e => setEditLicense({...editLicense, seatsAllocated: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="number" min="0" required value={editLicense.seatsAllocated} onChange={e => setEditLicense({...editLicense, seatsAllocated: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Expiry Date</label>
-                          <input type="date" value={editLicense.expiryDate ? editLicense.expiryDate.split('T')[0] : ""} onChange={e => setEditLicense({...editLicense, expiryDate: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="date" value={editLicense.expiryDate ? editLicense.expiryDate.split('T')[0] : ""} onChange={e => setEditLicense({...editLicense, expiryDate: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Status</label>
-                          <select value={editLicense.status} onChange={e => setEditLicense({...editLicense, status: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                          <select value={editLicense.status} onChange={e => setEditLicense({...editLicense, status: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                             <option value="ACTIVE">Active</option>
                             <option value="EXPIRED">Expired</option>
                             <option value="REVOKED">Revoked</option>
@@ -341,7 +342,7 @@ export default function Software() {
                         <button type="submit" disabled={updateMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                         </button>
-                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>

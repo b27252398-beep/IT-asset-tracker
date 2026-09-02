@@ -24,6 +24,7 @@ const itemVariants = {
 };
 
 export default function Locations() {
+  const [searchTerm, setSearchTerm] = useState('');
   const queryClient = useQueryClient();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -109,8 +110,8 @@ export default function Locations() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input 
               type="text" 
-              placeholder="Search facilities..." 
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+              placeholder="Search facilities..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} 
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
           <button 
@@ -124,7 +125,7 @@ export default function Locations() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {locations.map((loc: any) => (
+        {locations.filter((searchItem: any) => Object.values(searchItem || {}).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()))).map((loc: any) => (
           <motion.div 
             key={loc.id} 
             variants={itemVariants}
@@ -178,7 +179,7 @@ export default function Locations() {
         ))}
         
         {locations.length === 0 && (
-          <div className="col-span-full py-12 text-center bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300">
+          <div className="col-span-full py-12 text-center bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
             <Building className="w-12 h-12 text-slate-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-slate-900 dark:text-white">No Facilities Configured</h3>
             <p className="text-slate-500 dark:text-slate-400 mt-1">Add your first location to start organizing physical boundaries.</p>
@@ -210,31 +211,31 @@ export default function Locations() {
                     <form onSubmit={handleAddSubmit} className="mt-6 space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Facility Name *</label>
-                        <input type="text" required value={newLoc.name} onChange={e => setNewLoc({...newLoc, name: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. HQ - New York" />
+                        <input type="text" required value={newLoc.name} onChange={e => setNewLoc({...newLoc, name: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="e.g. HQ - New York" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Street Address</label>
-                        <input type="text" value={newLoc.address} onChange={e => setNewLoc({...newLoc, address: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="123 Corporate Blvd" />
+                        <input type="text" value={newLoc.address} onChange={e => setNewLoc({...newLoc, address: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="123 Corporate Blvd" />
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div className="col-span-1">
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">City</label>
-                          <input type="text" value={newLoc.city} onChange={e => setNewLoc({...newLoc, city: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="text" value={newLoc.city} onChange={e => setNewLoc({...newLoc, city: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div className="col-span-1">
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">State/Region</label>
-                          <input type="text" value={newLoc.state} onChange={e => setNewLoc({...newLoc, state: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="text" value={newLoc.state} onChange={e => setNewLoc({...newLoc, state: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div className="col-span-1">
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">ZIP</label>
-                          <input type="text" value={newLoc.zip} onChange={e => setNewLoc({...newLoc, zip: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="text" value={newLoc.zip} onChange={e => setNewLoc({...newLoc, zip: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                       </div>
                       <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-700">
                         <button type="submit" disabled={createMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {createMutation.isPending ? 'Saving...' : 'Add Facility'}
                         </button>
-                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>
@@ -264,29 +265,29 @@ export default function Locations() {
                     <form onSubmit={handleEditSubmit} className="mt-6 space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Facility Name *</label>
-                        <input type="text" required value={editLoc.name} onChange={e => setEditLoc({...editLoc, name: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                        <input type="text" required value={editLoc.name} onChange={e => setEditLoc({...editLoc, name: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Street Address</label>
-                        <input type="text" value={editLoc.address || ""} onChange={e => setEditLoc({...editLoc, address: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                        <input type="text" value={editLoc.address || ""} onChange={e => setEditLoc({...editLoc, address: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div className="col-span-1">
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">City</label>
-                          <input type="text" value={editLoc.city || ""} onChange={e => setEditLoc({...editLoc, city: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="text" value={editLoc.city || ""} onChange={e => setEditLoc({...editLoc, city: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div className="col-span-1">
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">State/Region</label>
-                          <input type="text" value={editLoc.state || ""} onChange={e => setEditLoc({...editLoc, state: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="text" value={editLoc.state || ""} onChange={e => setEditLoc({...editLoc, state: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div className="col-span-1">
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">ZIP</label>
-                          <input type="text" value={editLoc.zip || ""} onChange={e => setEditLoc({...editLoc, zip: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="text" value={editLoc.zip || ""} onChange={e => setEditLoc({...editLoc, zip: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Status</label>
-                        <select value={editLoc.status} onChange={e => setEditLoc({...editLoc, status: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <select value={editLoc.status} onChange={e => setEditLoc({...editLoc, status: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                           <option value="ACTIVE">Active</option>
                           <option value="INACTIVE">Inactive</option>
                         </select>
@@ -295,7 +296,7 @@ export default function Locations() {
                         <button type="submit" disabled={updateMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                         </button>
-                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>

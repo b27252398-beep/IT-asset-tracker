@@ -113,7 +113,7 @@ function TicketCard({
   return (
     <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="p-5 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50">
+      <div className="p-5 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-900/50">
         <div className="flex justify-between items-start gap-3">
           <div className="flex-1 min-w-0">
             <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight truncate">{req.title}</h3>
@@ -139,21 +139,21 @@ function TicketCard({
           <p className="text-sm text-slate-700 dark:text-slate-200 line-clamp-3">{req.description}</p>
         </div>
         {req.techNote && (
-          <div className="bg-purple-50 rounded-xl p-3 border border-purple-100">
-            <p className="text-xs text-purple-600 font-semibold uppercase mb-1">Tech Team Note</p>
-            <p className="text-sm text-purple-900">{req.techNote}</p>
+          <div className="bg-purple-50 dark:bg-purple-500/10 rounded-xl p-3 border border-purple-100 dark:border-purple-500/30">
+            <p className="text-xs text-purple-600 dark:text-purple-400 font-semibold uppercase mb-1">Tech Team Note</p>
+            <p className="text-sm text-purple-900 dark:text-purple-200">{req.techNote}</p>
           </div>
         )}
         {req.resolvedNote && (
           <div className="bg-emerald-50 dark:bg-emerald-500/10 rounded-xl p-3 border border-emerald-100 dark:border-emerald-500/30">
             <p className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold uppercase mb-1">Resolution</p>
-            <p className="text-sm text-emerald-900">{req.resolvedNote}</p>
+            <p className="text-sm text-emerald-900 dark:text-emerald-200">{req.resolvedNote}</p>
           </div>
         )}
         {req.rejectionReason && (
           <div className="bg-red-50 dark:bg-red-500/10 rounded-xl p-3 border border-red-100 dark:border-red-500/30">
             <p className="text-xs text-red-600 dark:text-red-400 font-semibold uppercase mb-1">Rejection Reason</p>
-            <p className="text-sm text-red-900">{req.rejectionReason}</p>
+            <p className="text-sm text-red-900 dark:text-red-200">{req.rejectionReason}</p>
           </div>
         )}
       </div>
@@ -258,7 +258,7 @@ export default function Issues() {
     : validIssues;
 
   const filteredIssues = roleFilteredIssues.filter((i: any) =>
-    i.title?.toLowerCase().includes(search.toLowerCase())
+    Object.values(i || {}).some(val => String(val).toLowerCase().includes(search.toLowerCase()))
   );
 
   const roleTitle = userRole === 'ADMIN' ? 'All Tickets' : userRole === 'TECH_TEAM' ? 'Assigned Tickets' : 'My Tickets';
@@ -283,7 +283,7 @@ export default function Issues() {
             <input
               type="text" placeholder="Search tickets…" value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
           {userRole === 'EMPLOYEE' && (
@@ -348,7 +348,7 @@ export default function Issues() {
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Reporting Employee</label>
               <select required value={newReq.employeeId} onChange={e => setNewReq({ ...newReq, employeeId: e.target.value })}
-                className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                className="block w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="">Select your name…</option>
                 {(Array.isArray(employees) ? employees : []).map((emp: any) => (
                   <option key={emp.id} value={emp.id}>{emp.name}</option>
@@ -358,7 +358,7 @@ export default function Issues() {
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Affected Asset</label>
               <select required value={newReq.assetId} onChange={e => setNewReq({ ...newReq, assetId: e.target.value })}
-                className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                className="block w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="">Select asset…</option>
                 {(Array.isArray(assets) ? assets : []).map((asset: any) => (
                   <option key={asset.id} value={asset.id}>{asset.name} ({asset.assetTag})</option>
@@ -368,12 +368,12 @@ export default function Issues() {
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Issue Title</label>
               <input type="text" required value={newReq.title} onChange={e => setNewReq({ ...newReq, title: e.target.value })}
-                placeholder="e.g. Laptop screen flickering" className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                placeholder="e.g. Laptop screen flickering" className="block w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Priority</label>
               <select required value={newReq.priority} onChange={e => setNewReq({ ...newReq, priority: e.target.value })}
-                className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                className="block w-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="LOW">🟢 Low</option>
                 <option value="MEDIUM">🟡 Medium</option>
                 <option value="HIGH">🟠 High</option>
@@ -384,10 +384,10 @@ export default function Issues() {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Detailed Description</label>
               <textarea required value={newReq.description} onChange={e => setNewReq({ ...newReq, description: e.target.value })}
                 rows={3} placeholder="Describe the problem in detail…"
-                className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none" />
+                className="block w-full border border-slate-300 dark:border-slate-600 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
             </div>
             <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50">Cancel</button>
+              <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50">Cancel</button>
               <button type="submit" disabled={createMutation.isPending} className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-60">
                 {createMutation.isPending ? 'Submitting…' : 'Submit Ticket'}
               </button>
@@ -405,10 +405,10 @@ export default function Issues() {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Rejection Reason</label>
               <textarea rows={3} value={rejectionReason} onChange={e => setRejectionReason(e.target.value)}
                 placeholder="e.g. Not enough information provided, please resubmit with asset details…"
-                className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none" />
+                className="block w-full border border-slate-300 dark:border-slate-600 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none" />
             </div>
             <div className="flex justify-end gap-3">
-              <button onClick={() => { setRejectTarget(null); setRejectionReason(''); }} className="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50">Cancel</button>
+              <button onClick={() => { setRejectTarget(null); setRejectionReason(''); }} className="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50">Cancel</button>
               <button
                 disabled={!rejectionReason.trim() || rejectMutation.isPending}
                 onClick={() => rejectMutation.mutate({ id: rejectTarget.id, reason: rejectionReason })}
@@ -430,10 +430,10 @@ export default function Issues() {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Note for Tech Team</label>
               <textarea rows={3} value={techNote} onChange={e => setTechNote(e.target.value)}
                 placeholder="e.g. Please replace the faulty hard drive. Asset is in Room 204."
-                className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none" />
+                className="block w-full border border-slate-300 dark:border-slate-600 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none" />
             </div>
             <div className="flex justify-end gap-3">
-              <button onClick={() => { setForwardTarget(null); setTechNote(''); }} className="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50">Cancel</button>
+              <button onClick={() => { setForwardTarget(null); setTechNote(''); }} className="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50">Cancel</button>
               <button
                 disabled={!techNote.trim() || forwardMutation.isPending}
                 onClick={() => forwardMutation.mutate({ id: forwardTarget.id, note: techNote })}
@@ -455,10 +455,10 @@ export default function Issues() {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Resolution Notes</label>
               <textarea rows={3} value={resolvedNote} onChange={e => setResolvedNote(e.target.value)}
                 placeholder="e.g. Replaced the hard drive with a new 512GB SSD. Asset is back in service."
-                className="block w-full border border-slate-300 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none" />
+                className="block w-full border border-slate-300 dark:border-slate-600 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none" />
             </div>
             <div className="flex justify-end gap-3">
-              <button onClick={() => { setResolveTarget(null); setResolvedNote(''); }} className="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50">Cancel</button>
+              <button onClick={() => { setResolveTarget(null); setResolvedNote(''); }} className="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50">Cancel</button>
               <button
                 disabled={!resolvedNote.trim() || resolveMutation.isPending}
                 onClick={() => resolveMutation.mutate({ id: resolveTarget.id, note: resolvedNote })}

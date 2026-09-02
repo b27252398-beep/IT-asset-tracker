@@ -47,17 +47,32 @@ export default function ChatBot() {
     const input = userInput.toLowerCase();
     
     // --- 1. Small Talk & Capabilities ---
-    if (input.match(/^(hi|hello|hey|greetings|sup)\b/i)) {
+    if (input.match(/\b(hi+|hello+|hey+|greetings|sup|yo|hiya|howdy)\b/i) || input === 'hi' || input === 'hii') {
       return "Hello! I'm ready to help. Try asking me something like 'How many laptops do we have?' or 'Are there any open tickets?'";
     }
-    if (input.match(/how are you/i)) {
+    if (input.match(/how are you|how do you do|what's up|whats up/i)) {
       return "I'm running at peak efficiency! All systems are nominal. How can I assist you today?";
     }
-    if (input.match(/who are you|what are you/i)) {
+    if (input.match(/who are you|what are you|your name/i)) {
       return "I am the Smart IT Assistant built for this Final Year Project. I monitor all 8 modules of this IT Asset Management System in real-time!";
     }
-    if (input.match(/what can you do|help/i)) {
+    if (input.match(/what can you do|help|capabilities|features/i)) {
       return "I can fetch live data from any module! Ask me to count employees, check vendor status, find open helpdesk tickets, or count specific hardware like laptops and monitors.";
+    }
+    if (input.match(/thank/i)) {
+      return "You're very welcome! Let me know if you need anything else.";
+    }
+    if (input.match(/good|awesome|cool|nice|great|wow/i) && input.split(' ').length < 4) {
+      return "I'm glad you think so! Anything else I can look up for you?";
+    }
+    if (input.match(/bye|goodbye|see ya|cya/i)) {
+      return "Goodbye! I'll be right here if you need more data.";
+    }
+    if (input.match(/joke|funny/i)) {
+      return "Why do programmers prefer dark mode? Because light attracts bugs! 🐛";
+    }
+    if (input.match(/creator|made you|built you|author/i)) {
+      return "I was built as a showcase for this Final Year Project!";
     }
 
     try {
@@ -158,7 +173,7 @@ export default function ChatBot() {
     }
 
     // --- 3. Static Navigation & Actions ---
-    if (input.match(/go to|navigate to|open/i)) {
+    if (input.match(/go to|navigate to|open|take me to/i)) {
       if (input.match(/asset/i)) {
         setTimeout(() => navigate('/assets'), 1500);
         return "Taking you to the Assets dashboard...";
@@ -176,12 +191,9 @@ export default function ChatBot() {
     if (input.match(/checkout|assign|give/i)) {
       return "To assign an asset, go to the Assets page, click the 3-dot menu on an Available item, and select 'Check Out'.";
     }
-    if (input.match(/thank/i)) {
-      return "You're welcome! Let me know if you need anything else.";
-    }
     
     // --- 4. Ultimate Fallback ---
-    return "I couldn't quite understand that. Try asking me a direct question like: 'How many laptops do we have?' or 'Are there any open tickets?'";
+    return "I'm not quite sure how to answer that yet! I am specifically trained to monitor the IT modules (assets, employees, tickets, software, vendors). Try asking me about those, or ask me for a joke!";
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -232,7 +244,7 @@ export default function ChatBot() {
             {/* Header */}
             <div className="bg-indigo-600 dark:bg-indigo-900 p-4 flex justify-between items-center text-white">
               <div className="flex items-center space-x-2">
-                <div className="bg-white/20 p-1.5 rounded-lg">
+                <div className="bg-white dark:bg-slate-900/20 p-1.5 rounded-lg">
                   <Bot className="w-5 h-5" />
                 </div>
                 <div>
@@ -242,7 +254,7 @@ export default function ChatBot() {
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="text-indigo-100 hover:text-white p-1 rounded-md hover:bg-white/10 transition-colors cursor-pointer"
+                className="text-indigo-100 hover:text-white p-1 rounded-md hover:bg-white dark:bg-slate-900/10 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>

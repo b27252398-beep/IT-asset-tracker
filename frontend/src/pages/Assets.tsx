@@ -233,11 +233,11 @@ export default function Assets() {
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case "LAPTOP": return <Laptop className="w-5 h-5 text-slate-500" />;
-      case "DESKTOP": return <Monitor className="w-5 h-5 text-slate-500" />;
-      case "MOBILE": return <Smartphone className="w-5 h-5 text-slate-500" />;
-      case "SERVER": return <Server className="w-5 h-5 text-slate-500" />;
-      default: return <Monitor className="w-5 h-5 text-slate-500" />;
+      case "LAPTOP": return <Laptop className="w-5 h-5 text-slate-500 dark:text-slate-400" />;
+      case "DESKTOP": return <Monitor className="w-5 h-5 text-slate-500 dark:text-slate-400" />;
+      case "MOBILE": return <Smartphone className="w-5 h-5 text-slate-500 dark:text-slate-400" />;
+      case "SERVER": return <Server className="w-5 h-5 text-slate-500 dark:text-slate-400" />;
+      default: return <Monitor className="w-5 h-5 text-slate-500 dark:text-slate-400" />;
     }
   };
 
@@ -252,13 +252,12 @@ export default function Assets() {
       case "RETIRED":
         return <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700 border border-red-200">Retired</span>;
       default:
-        return <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-700 border border-slate-200">{status}</span>;
+        return <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700">{status}</span>;
     }
   };
 
   const filteredAssets = assets.filter(asset => {
-    const matchesSearch = asset.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          asset.assetTag?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = Object.values(asset || {}).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = filterCategory === "ALL" || asset.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
@@ -267,8 +266,8 @@ export default function Assets() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Asset Inventory</h1>
-          <p className="text-slate-500 text-sm mt-1">Manage and track all hardware assets across the organization.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Asset Inventory</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage and track all hardware assets across the organization.</p>
         </div>
         <div className="flex items-center space-x-3">
           <div className="relative">
@@ -281,7 +280,7 @@ export default function Assets() {
               title="Upload CSV to Bulk Import"
             />
             <button 
-              className={`inline-flex items-center justify-center px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg shadow-sm transition-colors ${importing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50 focus:ring-4 focus:ring-slate-100'}`}
+              className={`inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-medium rounded-lg shadow-sm transition-colors ${importing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50 dark:bg-slate-900/50 focus:ring-4 focus:ring-slate-100'}`}
             >
               {importing ? (
                 <div className="w-4 h-4 mr-2 border-2 border-slate-400 border-t-transparent rounded-full animate-spin"></div>
@@ -293,7 +292,7 @@ export default function Assets() {
           </div>
           <button 
             onClick={downloadAssetsCSV}
-            className="inline-flex items-center justify-center px-4 py-2 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 focus:ring-4 focus:ring-slate-100 transition-colors shadow-sm cursor-pointer"
+            className="inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-medium rounded-lg hover:bg-slate-50 dark:bg-slate-900/50 focus:ring-4 focus:ring-slate-100 transition-colors shadow-sm cursor-pointer"
           >
             <Download className="w-4 h-4 mr-2" />
             Export CSV
@@ -310,8 +309,8 @@ export default function Assets() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-50/50">
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row gap-4 items-center justify-between bg-slate-50 dark:bg-slate-800/50">
           <div className="relative w-full sm:w-72">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-4 w-4 text-slate-400" />
@@ -319,19 +318,19 @@ export default function Assets() {
             <input
               type="text"
               placeholder="Search by name or tag..."
-              className="block w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              className="block w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none placeholder-slate-400 dark:placeholder-slate-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <div className="relative w-full sm:w-auto inline-flex">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Filter className="w-4 h-4 text-slate-500" />
+              <Filter className="w-4 h-4 text-slate-500 dark:text-slate-400" />
             </div>
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="appearance-none inline-flex items-center pl-9 pr-8 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              className="appearance-none inline-flex items-center pl-9 pr-8 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
             >
               <option value="ALL">All Categories</option>
               <option value="LAPTOP">Laptops</option>
@@ -347,7 +346,7 @@ export default function Assets() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
+            <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-300 font-medium border-b border-slate-200 dark:border-slate-700">
               <tr>
                 <th className="px-6 py-4">Asset Name</th>
                 <th className="px-6 py-4">Tag / Serial</th>
@@ -360,7 +359,7 @@ export default function Assets() {
             <tbody className="divide-y divide-slate-200">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
                     <div className="flex justify-center mb-2">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
                     </div>
@@ -369,27 +368,27 @@ export default function Assets() {
                 </tr>
               ) : filteredAssets.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
                     No assets found matching your search.
                   </td>
                 </tr>
               ) : (
                 filteredAssets.map((asset) => (
-                  <tr key={asset.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={asset.id} className="hover:bg-slate-50 dark:bg-slate-900/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center">
-                        <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-slate-100 flex items-center justify-center border border-slate-200">
+                        <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
                           {getCategoryIcon(asset.category)}
                         </div>
                         <div className="ml-4">
-                          <div className="font-medium text-slate-900">{asset.name}</div>
-                          <div className="text-slate-500 text-xs mt-0.5">{asset.category}</div>
+                          <div className="font-medium text-slate-900 dark:text-white">{asset.name}</div>
+                          <div className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">{asset.category}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-slate-900 font-medium">{asset.assetTag}</div>
-                      <div className="text-slate-500 text-xs mt-0.5">{asset.serialNumber || 'No serial'}</div>
+                      <div className="text-slate-900 dark:text-white font-medium">{asset.assetTag}</div>
+                      <div className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">{asset.serialNumber || 'No serial'}</div>
                     </td>
                     <td className="px-6 py-4">
                       {getStatusBadge(asset.status)}
@@ -400,13 +399,13 @@ export default function Assets() {
                           <div className="h-6 w-6 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold mr-2">
                             {asset.currentUser.charAt(0)}
                           </div>
-                          <span className="text-slate-700">{asset.currentUser}</span>
+                          <span className="text-slate-700 dark:text-slate-200">{asset.currentUser}</span>
                         </div>
                       ) : (
                         <span className="text-slate-400 italic">Unassigned</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-slate-600">
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
                       {asset.location || 'Unknown'}
                     </td>
                     <td className="px-6 py-4 text-right space-x-3">
@@ -430,7 +429,7 @@ export default function Assets() {
                           )}
                           <button 
                             onClick={() => setEditAsset(asset)}
-                            className="text-slate-600 hover:text-slate-900 font-medium text-sm cursor-pointer"
+                            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white font-medium text-sm cursor-pointer"
                           >
                             Edit
                           </button>
@@ -457,11 +456,11 @@ export default function Assets() {
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-slate-900/50" aria-hidden="true" onClick={() => setIsAddModalOpen(false)}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className="relative z-10 inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100">
+            <div className="relative z-10 inline-block align-bottom bg-white dark:bg-slate-900 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+              <div className="bg-white dark:bg-slate-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg leading-6 font-medium text-slate-900" id="modal-title">Register New Asset</h3>
-                  <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-500 cursor-pointer">
+                  <h3 className="text-lg leading-6 font-medium text-slate-900 dark:text-white" id="modal-title">Register New Asset</h3>
+                  <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-500 dark:text-slate-400 cursor-pointer">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
@@ -472,16 +471,16 @@ export default function Assets() {
                 )}
                 <form onSubmit={handleAddAsset} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Asset Name</label>
-                    <input type="text" required value={newAsset.name} onChange={e => setNewAsset({...newAsset, name: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g. MacBook Pro M3" />
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Asset Name</label>
+                    <input type="text" required value={newAsset.name} onChange={e => setNewAsset({...newAsset, name: e.target.value})} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500" placeholder="e.g. MacBook Pro M3" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Asset Tag</label>
-                    <input type="text" required value={newAsset.assetTag} onChange={e => setNewAsset({...newAsset, assetTag: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g. TAG-2024-001" />
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Asset Tag</label>
+                    <input type="text" required value={newAsset.assetTag} onChange={e => setNewAsset({...newAsset, assetTag: e.target.value})} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500" placeholder="e.g. TAG-2024-001" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Category</label>
-                    <select value={newAsset.category} onChange={e => setNewAsset({...newAsset, category: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Category</label>
+                    <select value={newAsset.category} onChange={e => setNewAsset({...newAsset, category: e.target.value})} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500">
                       <option value="LAPTOP">Laptop</option>
                       <option value="DESKTOP">Desktop</option>
                       <option value="MOBILE">Mobile Device</option>
@@ -489,18 +488,18 @@ export default function Assets() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Location</label>
-                    <input type="text" value={newAsset.location} onChange={e => setNewAsset({...newAsset, location: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g. NY Office - 3rd Floor" />
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Location</label>
+                    <input type="text" value={newAsset.location} onChange={e => setNewAsset({...newAsset, location: e.target.value})} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500" placeholder="e.g. NY Office - 3rd Floor" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Warranty Expiration</label>
-                    <input type="date" value={newAsset.warrantyExpiry} onChange={e => setNewAsset({...newAsset, warrantyExpiry: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Warranty Expiration</label>
+                    <input type="date" value={newAsset.warrantyExpiry} onChange={e => setNewAsset({...newAsset, warrantyExpiry: e.target.value})} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500" />
                   </div>
-                  <div className="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100">
-                    <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                  <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-800">
+                    <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                       Create Asset
                     </button>
-                    <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                    <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                       Cancel
                     </button>
                   </div>
@@ -517,32 +516,32 @@ export default function Assets() {
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-slate-900/50" aria-hidden="true" onClick={() => { setViewAsset(null); setSearchParams({}); }}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className="relative z-10 inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100">
+            <div className="relative z-10 inline-block align-bottom bg-white dark:bg-slate-900 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+              <div className="bg-white dark:bg-slate-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg leading-6 font-medium text-slate-900">Asset Details</h3>
-                  <button onClick={() => { setViewAsset(null); setSearchParams({}); }} className="text-slate-400 hover:text-slate-500 cursor-pointer">
+                  <h3 className="text-lg leading-6 font-medium text-slate-900 dark:text-white">Asset Details</h3>
+                  <button onClick={() => { setViewAsset(null); setSearchParams({}); }} className="text-slate-400 hover:text-slate-500 dark:text-slate-400 cursor-pointer">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex border-b border-slate-200 mb-6">
+                <div className="flex border-b border-slate-200 dark:border-slate-700 mb-6">
                   <button
                     onClick={() => setActiveTab('DETAILS')}
-                    className={`pb-3 px-1 mr-6 font-medium text-sm transition-colors border-b-2 ${activeTab === 'DETAILS' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}
+                    className={`pb-3 px-1 mr-6 font-medium text-sm transition-colors border-b-2 ${activeTab === 'DETAILS' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:border-slate-300 dark:border-slate-600'}`}
                   >
                     Asset Details
                   </button>
                   <button
                     onClick={() => setActiveTab('MAINTENANCE')}
-                    className={`pb-3 px-1 mr-6 font-medium text-sm transition-colors border-b-2 ${activeTab === 'MAINTENANCE' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}
+                    className={`pb-3 px-1 mr-6 font-medium text-sm transition-colors border-b-2 ${activeTab === 'MAINTENANCE' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:border-slate-300 dark:border-slate-600'}`}
                   >
                     Maintenance & Repairs
                   </button>
                   <button
                     onClick={() => setActiveTab('DOCUMENTS')}
-                    className={`pb-3 px-1 font-medium text-sm transition-colors border-b-2 ${activeTab === 'DOCUMENTS' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}
+                    className={`pb-3 px-1 font-medium text-sm transition-colors border-b-2 ${activeTab === 'DOCUMENTS' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:border-slate-300 dark:border-slate-600'}`}
                   >
                     Documents
                   </button>
@@ -555,48 +554,48 @@ export default function Assets() {
                         {/* Left Column - Details */}
                         <div className="flex-1 grid grid-cols-2 gap-4">
                           <div>
-                            <span className="block text-sm font-medium text-slate-500">Name</span>
-                            <span className="block text-sm text-slate-900 mt-1">{viewAsset.name}</span>
+                            <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Name</span>
+                            <span className="block text-sm text-slate-900 dark:text-white mt-1">{viewAsset.name}</span>
                           </div>
                           <div>
-                            <span className="block text-sm font-medium text-slate-500">Category</span>
-                            <span className="block text-sm text-slate-900 mt-1">{viewAsset.category}</span>
+                            <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Category</span>
+                            <span className="block text-sm text-slate-900 dark:text-white mt-1">{viewAsset.category}</span>
                           </div>
                           <div>
-                            <span className="block text-sm font-medium text-slate-500">Asset Tag</span>
-                            <span className="block text-sm text-slate-900 mt-1 font-mono">{viewAsset.assetTag}</span>
+                            <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Asset Tag</span>
+                            <span className="block text-sm text-slate-900 dark:text-white mt-1 font-mono">{viewAsset.assetTag}</span>
                           </div>
                           <div>
-                            <span className="block text-sm font-medium text-slate-500">Serial Number</span>
-                            <span className="block text-sm text-slate-900 mt-1 font-mono">{viewAsset.serialNumber || "N/A"}</span>
+                            <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Serial Number</span>
+                            <span className="block text-sm text-slate-900 dark:text-white mt-1 font-mono">{viewAsset.serialNumber || "N/A"}</span>
                           </div>
                           <div>
-                            <span className="block text-sm font-medium text-slate-500">Status</span>
-                            <span className="block text-sm text-slate-900 mt-1">{viewAsset.status}</span>
+                            <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Status</span>
+                            <span className="block text-sm text-slate-900 dark:text-white mt-1">{viewAsset.status}</span>
                           </div>
                           <div>
-                            <span className="block text-sm font-medium text-slate-500">Assigned To</span>
-                            <span className="block text-sm text-slate-900 mt-1">{viewAsset.currentUser || "Unassigned"}</span>
+                            <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Assigned To</span>
+                            <span className="block text-sm text-slate-900 dark:text-white mt-1">{viewAsset.currentUser || "Unassigned"}</span>
                           </div>
                           <div>
-                            <span className="block text-sm font-medium text-slate-500">Location</span>
-                            <span className="block text-sm text-slate-900 mt-1">{viewAsset.location || "Unknown"}</span>
+                            <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Location</span>
+                            <span className="block text-sm text-slate-900 dark:text-white mt-1">{viewAsset.location || "Unknown"}</span>
                           </div>
                           <div className="col-span-2">
-                            <span className="block text-sm font-medium text-slate-500">Warranty Expiration</span>
-                            <span className="block text-sm text-slate-900 mt-1">{viewAsset.warrantyExpiry ? new Date(viewAsset.warrantyExpiry).toLocaleDateString() : "No Warranty Logged"}</span>
+                            <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">Warranty Expiration</span>
+                            <span className="block text-sm text-slate-900 dark:text-white mt-1">{viewAsset.warrantyExpiry ? new Date(viewAsset.warrantyExpiry).toLocaleDateString() : "No Warranty Logged"}</span>
                           </div>
                         </div>
                         
                         {/* Right Column - QR Code */}
-                        <div className="w-full md:w-48 flex flex-col items-center justify-center bg-slate-50 p-4 rounded-xl border border-slate-200 print:hidden">
-                          <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-100 mb-3">
+                        <div className="w-full md:w-48 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 print:hidden">
+                          <div className="bg-white dark:bg-slate-900 p-2 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 mb-3">
                             <QRCodeSVG value={viewAsset.id} size={120} />
                           </div>
-                          <span className="text-xs text-slate-500 mb-3 text-center">Scan to view details</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400 mb-3 text-center">Scan to view details</span>
                           <button 
                             onClick={handlePrintQR}
-                            className="flex items-center justify-center w-full px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-medium rounded transition-colors cursor-pointer"
+                            className="flex items-center justify-center w-full px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 dark:text-slate-200 text-sm font-medium rounded transition-colors cursor-pointer"
                           >
                             <Printer className="w-4 h-4 mr-2" />
                             Print Label
@@ -607,23 +606,23 @@ export default function Assets() {
                         <div className="hidden print:flex flex-col items-center justify-center w-full mt-8 border-t pt-8">
                            <QRCodeSVG value={viewAsset.id} size={200} />
                            <h2 className="mt-4 font-bold text-xl">{viewAsset.name}</h2>
-                           <p className="font-mono mt-1 text-slate-600">{viewAsset.assetTag}</p>
+                           <p className="font-mono mt-1 text-slate-600 dark:text-slate-300">{viewAsset.assetTag}</p>
                         </div>
                       </div>
                       
                       {/* Activity Logs Section */}
-                      <div className="mt-6 border-t border-slate-100 pt-4">
-                        <h4 className="text-sm font-semibold text-slate-900 mb-3">Activity History</h4>
-                        <div className="bg-slate-50 rounded-lg p-4 max-h-60 overflow-y-auto border border-slate-200">
+                      <div className="mt-6 border-t border-slate-100 dark:border-slate-800 pt-4">
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Activity History</h4>
+                        <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 max-h-60 overflow-y-auto border border-slate-200 dark:border-slate-700">
                           {assetLogs.length === 0 ? (
-                            <p className="text-sm text-slate-500 italic text-center py-2">No activity recorded for this asset.</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 italic text-center py-2">No activity recorded for this asset.</p>
                           ) : (
                             <div className="space-y-4">
                               {assetLogs.map(log => (
                                 <div key={log.id} className="relative pl-4 border-l-2 border-indigo-200">
                                   <div className="absolute w-2 h-2 bg-indigo-500 rounded-full -left-[5px] top-1.5"></div>
-                                  <p className="text-xs font-semibold text-slate-900">{log.action}</p>
-                                  <p className="text-xs text-slate-500 mt-0.5">{log.details}</p>
+                                  <p className="text-xs font-semibold text-slate-900 dark:text-white">{log.action}</p>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{log.details}</p>
                                   <div className="text-[11px] text-slate-400 mt-1 flex justify-between">
                                     <span>By: {log.performedBy}</span>
                                     <span>{new Date(log.timestamp).toLocaleString()}</span>
@@ -639,15 +638,15 @@ export default function Assets() {
                     <div className="space-y-6">
                       {/* Log a New Repair Form (Admin only) */}
                       {userRole === 'ADMIN' && viewAsset.status !== 'IN_REPAIR' && (
-                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                          <h4 className="text-sm font-semibold text-slate-900 mb-3">Log Maintenance Request</h4>
+                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                          <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Log Maintenance Request</h4>
                           <form onSubmit={handleCreateRepair} className="space-y-3">
                             <div>
                               <input 
                                 type="text" 
                                 required 
                                 placeholder="Describe the issue (e.g. Screen cracked, Battery replacement)"
-                                className="w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                                 value={newRepair.issueDescription}
                                 onChange={e => setNewRepair({...newRepair, issueDescription: e.target.value})}
                               />
@@ -656,7 +655,7 @@ export default function Assets() {
                               <input 
                                 type="number" 
                                 placeholder="Estimated Cost (optional)"
-                                className="w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                className="w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                                 value={newRepair.cost}
                                 onChange={e => setNewRepair({...newRepair, cost: e.target.value})}
                               />
@@ -673,22 +672,22 @@ export default function Assets() {
                       
                       {/* Ongoing / Past Repairs List */}
                       <div>
-                        <h4 className="text-sm font-semibold text-slate-900 mb-3">Maintenance History</h4>
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Maintenance History</h4>
                         {assetMaintenance.length === 0 ? (
-                          <p className="text-sm text-slate-500 italic py-2">No maintenance records found.</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400 italic py-2">No maintenance records found.</p>
                         ) : (
                           <div className="space-y-3">
                             {assetMaintenance.map(maint => (
-                              <div key={maint.id} className="p-3 bg-white border border-slate-200 rounded-lg flex justify-between items-start">
+                              <div key={maint.id} className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg flex justify-between items-start">
                                 <div>
                                   <div className="flex items-center gap-2 mb-1">
                                     <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full ${maint.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
                                       {maint.status}
                                     </span>
-                                    <span className="text-xs text-slate-500">{new Date(maint.createdAt).toLocaleDateString()}</span>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">{new Date(maint.createdAt).toLocaleDateString()}</span>
                                   </div>
-                                  <p className="text-sm text-slate-900 font-medium">{maint.issueDescription}</p>
-                                  {maint.cost && <p className="text-xs text-slate-500 mt-1">Cost: ${maint.cost}</p>}
+                                  <p className="text-sm text-slate-900 dark:text-white font-medium">{maint.issueDescription}</p>
+                                  {maint.cost && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Cost: ${maint.cost}</p>}
                                 </div>
                                 {userRole === 'ADMIN' && maint.status !== 'COMPLETED' && (
                                   <button 
@@ -711,8 +710,8 @@ export default function Assets() {
                       <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-6 text-center">
                         <div className="flex flex-col items-center justify-center">
                           <Upload className="w-8 h-8 text-indigo-500 mb-3" />
-                          <h4 className="font-semibold text-slate-900">Upload Document</h4>
-                          <p className="text-xs text-slate-500 mt-1 mb-4">Attach receipts, manuals, or photos</p>
+                          <h4 className="font-semibold text-slate-900 dark:text-white">Upload Document</h4>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-4">Attach receipts, manuals, or photos</p>
                           
                           <label className="relative cursor-pointer">
                             <input 
@@ -729,19 +728,19 @@ export default function Assets() {
                       </div>
                       
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-slate-900 text-sm">Attached Documents</h4>
+                        <h4 className="font-semibold text-slate-900 dark:text-white text-sm">Attached Documents</h4>
                         {assetDocuments.length === 0 ? (
-                          <p className="text-sm text-slate-500 text-center py-4 bg-slate-50 rounded-lg border border-dashed border-slate-200">No documents attached yet.</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-dashed border-slate-200 dark:border-slate-700">No documents attached yet.</p>
                         ) : (
                           assetDocuments.map((doc) => (
-                            <div key={doc.id} className="flex items-center justify-between bg-white border border-slate-100 p-3 rounded-lg shadow-sm">
+                            <div key={doc.id} className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-3 rounded-lg shadow-sm">
                               <div className="flex items-center space-x-3 overflow-hidden">
-                                <div className="w-8 h-8 bg-slate-100 text-slate-500 rounded flex items-center justify-center shrink-0">
+                                <div className="w-8 h-8 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded flex items-center justify-center shrink-0">
                                   <Download className="w-4 h-4" />
                                 </div>
                                 <div className="truncate text-left flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-slate-900 truncate">{doc.filename}</p>
-                                  <p className="text-xs text-slate-500">{(doc.size / 1024).toFixed(1)} KB • {new Date(doc.createdAt).toLocaleDateString()}</p>
+                                  <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{doc.filename}</p>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">{(doc.size / 1024).toFixed(1)} KB • {new Date(doc.createdAt).toLocaleDateString()}</p>
                                 </div>
                               </div>
                               <a 
@@ -759,8 +758,8 @@ export default function Assets() {
                     </div>
                   )}
 
-                  <div className="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100">
-                    <button type="button" onClick={() => { setViewAsset(null); setSearchParams({}); }} className="w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm cursor-pointer">
+                  <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-800">
+                    <button type="button" onClick={() => { setViewAsset(null); setSearchParams({}); }} className="w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm cursor-pointer">
                       Close
                     </button>
                   </div>
@@ -776,11 +775,11 @@ export default function Assets() {
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-slate-900/50" aria-hidden="true" onClick={() => setEditAsset(null)}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className="relative z-10 inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100">
+            <div className="relative z-10 inline-block align-bottom bg-white dark:bg-slate-900 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+              <div className="bg-white dark:bg-slate-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg leading-6 font-medium text-slate-900" id="modal-title">Edit Asset</h3>
-                  <button onClick={() => setEditAsset(null)} className="text-slate-400 hover:text-slate-500 cursor-pointer">
+                  <h3 className="text-lg leading-6 font-medium text-slate-900 dark:text-white" id="modal-title">Edit Asset</h3>
+                  <button onClick={() => setEditAsset(null)} className="text-slate-400 hover:text-slate-500 dark:text-slate-400 cursor-pointer">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
@@ -791,16 +790,16 @@ export default function Assets() {
                 )}
                 <form onSubmit={handleEditAsset} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Asset Name</label>
-                    <input type="text" required value={editAsset.name} onChange={e => setEditAsset({...editAsset, name: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Asset Name</label>
+                    <input type="text" required value={editAsset.name} onChange={e => setEditAsset({...editAsset, name: e.target.value})} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Asset Tag</label>
-                    <input type="text" required value={editAsset.assetTag} onChange={e => setEditAsset({...editAsset, assetTag: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Asset Tag</label>
+                    <input type="text" required value={editAsset.assetTag} onChange={e => setEditAsset({...editAsset, assetTag: e.target.value})} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Category</label>
-                    <select value={editAsset.category} onChange={e => setEditAsset({...editAsset, category: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Category</label>
+                    <select value={editAsset.category} onChange={e => setEditAsset({...editAsset, category: e.target.value})} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500">
                       <option value="LAPTOP">Laptop</option>
                       <option value="DESKTOP">Desktop</option>
                       <option value="MOBILE">Mobile Device</option>
@@ -808,8 +807,8 @@ export default function Assets() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Status</label>
-                    <select value={editAsset.status} onChange={e => setEditAsset({...editAsset, status: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Status</label>
+                    <select value={editAsset.status} onChange={e => setEditAsset({...editAsset, status: e.target.value})} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500">
                       <option value="AVAILABLE">Available</option>
                       <option value="ASSIGNED">Assigned</option>
                       <option value="IN_REPAIR">In Repair</option>
@@ -817,18 +816,18 @@ export default function Assets() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Location</label>
-                    <input type="text" value={editAsset.location} onChange={e => setEditAsset({...editAsset, location: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Location</label>
+                    <input type="text" value={editAsset.location} onChange={e => setEditAsset({...editAsset, location: e.target.value})} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Warranty Expiry Date</label>
-                    <input type="date" value={editAsset.warrantyExpiry ? editAsset.warrantyExpiry.split('T')[0] : ""} onChange={e => setEditAsset({...editAsset, warrantyExpiry: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Warranty Expiry Date</label>
+                    <input type="date" value={editAsset.warrantyExpiry ? editAsset.warrantyExpiry.split('T')[0] : ""} onChange={e => setEditAsset({...editAsset, warrantyExpiry: e.target.value})} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500" />
                   </div>
-                  <div className="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100">
-                    <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                  <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-800">
+                    <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                       Save Changes
                     </button>
-                    <button type="button" onClick={() => setEditAsset(null)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                    <button type="button" onClick={() => setEditAsset(null)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                       Cancel
                     </button>
                   </div>
@@ -845,29 +844,29 @@ export default function Assets() {
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 bg-slate-900/50" aria-hidden="true" onClick={() => setCheckOutAssetId(null)}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className="relative z-10 inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100">
+            <div className="relative z-10 inline-block align-bottom bg-white dark:bg-slate-900 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+              <div className="bg-white dark:bg-slate-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg leading-6 font-medium text-slate-900" id="modal-title">Check Out Asset</h3>
-                  <button onClick={() => setCheckOutAssetId(null)} className="text-slate-400 hover:text-slate-500 cursor-pointer">
+                  <h3 className="text-lg leading-6 font-medium text-slate-900 dark:text-white" id="modal-title">Check Out Asset</h3>
+                  <button onClick={() => setCheckOutAssetId(null)} className="text-slate-400 hover:text-slate-500 dark:text-slate-400 cursor-pointer">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
                 <form onSubmit={handleCheckOut} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700">Assign to Employee</label>
-                    <select required value={selectedEmployeeId} onChange={e => setSelectedEmployeeId(e.target.value)} className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Assign to Employee</label>
+                    <select required value={selectedEmployeeId} onChange={e => setSelectedEmployeeId(e.target.value)} className="mt-1 block w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400 dark:placeholder-slate-500">
                       <option value="">-- Select Employee --</option>
                       {employees.map(emp => (
                         <option key={emp.id} value={emp.id}>{emp.name} ({emp.department})</option>
                       ))}
                     </select>
                   </div>
-                  <div className="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100">
-                    <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                  <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-800">
+                    <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                       Confirm Check Out
                     </button>
-                    <button type="button" onClick={() => setCheckOutAssetId(null)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                    <button type="button" onClick={() => setCheckOutAssetId(null)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                       Cancel
                     </button>
                   </div>

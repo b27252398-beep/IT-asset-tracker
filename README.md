@@ -1,145 +1,86 @@
-# IT Asset Tracker
+# 🎓 Omniscient IT Asset Management System
 
-Full-stack inventory & assignment management system.
-
-**Stack:** React + Tailwind CSS → Java Spring Boot REST API → Supabase (PostgreSQL)
-
----
-
-## Project Structure
-
-```
-it-asset-tracker/
-├── schema.sql                          ← Run this in Supabase SQL Editor first
-├── backend/                            ← Spring Boot Java project
-│   ├── pom.xml
-│   └── src/main/
-│       ├── java/com/assettracker/
-│       │   ├── AssetTrackerApplication.java
-│       │   ├── config/CorsConfig.java
-│       │   ├── controller/AssetController.java
-│       │   ├── model/
-│       │   │   ├── Asset.java
-│       │   │   └── AssignmentLog.java
-│       │   └── repository/
-│       │       ├── AssetRepository.java
-│       │       └── AssignmentLogRepository.java
-│       └── resources/application.properties
-└── frontend/                           ← React + Vite project
-    ├── package.json
-    ├── vite.config.js
-    ├── tailwind.config.js
-    ├── index.html
-    └── src/
-        ├── main.jsx
-        ├── App.jsx
-        ├── index.css
-        ├── api/assetApi.js
-        └── components/Dashboard.jsx
-```
+> **A Comprehensive, AI-Powered IT Asset Tracking & Management Dashboard.**  
+> Built as a Final Year Project to demonstrate modern web development, state management, and real-time data visualization.
 
 ---
 
-## Setup Guide
+## 🌟 Key Features
 
-### Step 1 — Supabase Database
+* **🤖 Omniscient ChatBot:** An integrated, NLP-powered assistant that queries the live database (e.g., *"How many laptops are available?"* or *"Are there any open tickets?"*).
+* **🌓 Seamless Dark Mode:** Flawless Light/Dark mode toggling built natively with Tailwind CSS, strictly passing accessibility contrast ratios.
+* **⚡ Real-Time Global Search:** Instant fuzzy-matching across all 8 internal modules (Assets, Vendors, Employees, Software, etc.).
+* **📊 Dashboard Analytics:** Visualizes 7-day rolling window hardware provisioning activities using Recharts.
+* **📄 One-Click PDF Export:** Generate professional IT compliance reports directly from the dashboard.
+* **🛡️ Role-Based Access Control:** Differentiated access levels for Employees, IT Techs, and Super Admins.
 
-1. Create a project at [supabase.com](https://supabase.com)
-2. Open **SQL Editor** in the dashboard
-3. Paste and run the full contents of `schema.sql`
-4. Verify tables `assets` and `assignment_logs` are created with seed data
+---
 
-### Step 2 — Java Backend
+## 🏗️ Architecture & Tech Stack
 
-**Prerequisites:** Java 17+, Maven 3.8+
+This project uses a decoupled Client-Server architecture to ensure high performance and scalability.
 
-1. Edit `backend/src/main/resources/application.properties`:
-   ```
-   spring.datasource.url=jdbc:postgresql://db.YOUR_PROJECT_REF.supabase.co:5432/postgres
-   spring.datasource.password=YOUR_SUPABASE_DB_PASSWORD
-   ```
-   Find these in: Supabase Dashboard → Project Settings → Database
+### **Frontend (Client)**
+* **React 18** (UI Library)
+* **Vite** (Build Tool & Dev Server)
+* **Tailwind CSS** (Utility-first styling & Dark Mode)
+* **Zustand** (Global State Management)
+* **TanStack React Query** (Data fetching, caching, and optimistic updates)
+* **Framer Motion** (Fluid animations and page transitions)
+* **Recharts** (Data visualization)
 
-2. Build and run:
-   ```bash
-   cd backend
-   mvn spring-boot:run
-   ```
-   The API will be available at `http://localhost:8080`
+### **Backend (API)**
+* **Node.js & Express** (RESTful API Server)
+* **Prisma ORM** (Database schema and migrations)
+* **SQLite** (Relational Database - easily swappable to PostgreSQL)
 
-3. Test the API:
-   ```bash
-   curl http://localhost:8080/api/assets/dashboard
-   curl http://localhost:8080/api/assets
-   ```
+---
 
-### Step 3 — React Frontend
+## 🚀 Getting Started (Local Development)
 
-**Prerequisites:** Node.js 18+
+### Prerequisites
+Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
+### 1. Clone the repository
+```bash
+git clone https://github.com/yourusername/it-asset-tracker.git
+cd it-asset-tracker
+```
+
+### 2. Setup the Backend
+```bash
+cd backend-node
+npm install
+npx prisma generate
+npx prisma db push
+node server.js
+```
+*The backend server will run on `http://localhost:5000`.*
+
+### 3. Setup the Frontend
+Open a new terminal window:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Open `http://localhost:5173` in your browser.
+*The frontend application will be available at `http://localhost:5173`.*
 
 ---
 
-## API Reference
+## 📸 Screenshots
+*(Note: Replace these placeholders with actual screenshots of your running application before submitting your project!)*
 
-| Method | Endpoint                     | Description                          |
-|--------|------------------------------|--------------------------------------|
-| GET    | `/api/assets/dashboard`      | Live metric counts                   |
-| GET    | `/api/assets`                | All assets (optional `?status=`)     |
-| GET    | `/api/assets/{id}`           | Single asset by UUID                 |
-| GET    | `/api/assets/{id}/logs`      | Assignment history for an asset      |
-| POST   | `/api/assets`                | Create new asset                     |
-| PUT    | `/api/assets/{id}/assign`    | Assign asset to a user               |
-| PUT    | `/api/assets/{id}/status`    | Change status (AVAILABLE/IN_REPAIR…) |
+### Dashboard & Analytics
+![Dashboard Screenshot](https://via.placeholder.com/800x400.png?text=Dashboard+Analytics+Overview)
 
-### Example: Assign an asset
-```bash
-curl -X PUT http://localhost:8080/api/assets/{UUID}/assign \
-  -H "Content-Type: application/json" \
-  -d '{"assignedTo": "Alice Johnson", "performedBy": "IT Admin"}'
-```
+### Omniscient ChatBot in Action
+![ChatBot Screenshot](https://via.placeholder.com/800x400.png?text=Omniscient+ChatBot+Answering+Queries)
 
-### Example: Mark as In-Repair
-```bash
-curl -X PUT http://localhost:8080/api/assets/{UUID}/status \
-  -H "Content-Type: application/json" \
-  -d '{"status": "IN_REPAIR", "notes": "LCD screen cracked", "performedBy": "IT Admin"}'
-```
+### Asset Management (Dark Mode)
+![Dark Mode Assets](https://via.placeholder.com/800x400.png?text=Asset+Registry+in+Dark+Mode)
 
 ---
 
-## Environment Variables (Frontend)
-
-Create `frontend/.env.local` to override the default API URL:
-```
-VITE_API_BASE_URL=http://localhost:8080/api
-```
-
-For production, set this to your deployed backend URL.
-
----
-
-## Asset Status Flow
-
-```
-        ┌──────────────────────────────────┐
-        │                                  │
-  [AVAILABLE] ──assign──► [ASSIGNED]       │
-       ▲                      │            │
-       │                  unassign         │
-       └──────────────────────┘            │
-       │                                   │
-  [IN_REPAIR] ◄──mark repair──────────────┘
-       │
-  mark available
-       │
-  [AVAILABLE]
-
-  [RETIRED] ← terminal state, no transitions out
-```
+## 👨‍💻 Developer
+Developed with ❤️ by **Krish Limbachiya** for the Final Year Project presentation.

@@ -24,6 +24,7 @@ const itemVariants = {
 };
 
 export default function MaintenanceSchedules() {
+  const [searchTerm, setSearchTerm] = useState('');
   const queryClient = useQueryClient();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -122,8 +123,8 @@ export default function MaintenanceSchedules() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input 
               type="text" 
-              placeholder="Search schedules..." 
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+              placeholder="Search schedules..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} 
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
           <button 
@@ -139,7 +140,7 @@ export default function MaintenanceSchedules() {
       <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
-            <thead className="bg-slate-50/50 dark:bg-slate-900/50">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-900/50">
               <tr>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Task</th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Frequency</th>
@@ -149,13 +150,13 @@ export default function MaintenanceSchedules() {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-700">
-              {schedules.map((sched: any) => {
+              {schedules.filter((searchItem: any) => Object.values(searchItem || {}).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()))).map((sched: any) => {
                 const overdue = sched.status === 'ACTIVE' && isOverdue(sched.nextDueDate);
                 
                 return (
                   <motion.tr 
                     key={sched.id} 
-                    className={`hover:bg-slate-50/50 dark:bg-slate-900/50 transition-colors ${overdue ? 'bg-red-50/30 dark:bg-red-500/10' : ''}`}
+                    className={`hover:bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-900/50 transition-colors ${overdue ? 'bg-red-50/30 dark:bg-red-500/10' : ''}`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
@@ -242,16 +243,16 @@ export default function MaintenanceSchedules() {
                     <form onSubmit={handleAddSubmit} className="mt-6 space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Title</label>
-                        <input type="text" required value={newSched.title} onChange={e => setNewSched({...newSched, title: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Quarterly Server Patching" />
+                        <input type="text" required value={newSched.title} onChange={e => setNewSched({...newSched, title: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="Quarterly Server Patching" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Description</label>
-                        <textarea rows={3} value={newSched.description} onChange={e => setNewSched({...newSched, description: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Details about the task..."></textarea>
+                        <textarea rows={3} value={newSched.description} onChange={e => setNewSched({...newSched, description: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="Details about the task..."></textarea>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Frequency</label>
-                          <select value={newSched.frequency} onChange={e => setNewSched({...newSched, frequency: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                          <select value={newSched.frequency} onChange={e => setNewSched({...newSched, frequency: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                             <option value="WEEKLY">Weekly</option>
                             <option value="MONTHLY">Monthly</option>
                             <option value="QUARTERLY">Quarterly</option>
@@ -260,14 +261,14 @@ export default function MaintenanceSchedules() {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Next Due Date</label>
-                          <input type="date" required value={newSched.nextDueDate} onChange={e => setNewSched({...newSched, nextDueDate: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="date" required value={newSched.nextDueDate} onChange={e => setNewSched({...newSched, nextDueDate: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                       </div>
                       <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-700">
                         <button type="submit" disabled={createMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {createMutation.isPending ? 'Saving...' : 'Create Schedule'}
                         </button>
-                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>
@@ -297,16 +298,16 @@ export default function MaintenanceSchedules() {
                     <form onSubmit={handleEditSubmit} className="mt-6 space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Title</label>
-                        <input type="text" required value={editSched.title} onChange={e => setEditSched({...editSched, title: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                        <input type="text" required value={editSched.title} onChange={e => setEditSched({...editSched, title: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Description</label>
-                        <textarea rows={3} value={editSched.description || ""} onChange={e => setEditSched({...editSched, description: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                        <textarea rows={3} value={editSched.description || ""} onChange={e => setEditSched({...editSched, description: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"></textarea>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Frequency</label>
-                          <select value={editSched.frequency} onChange={e => setEditSched({...editSched, frequency: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                          <select value={editSched.frequency} onChange={e => setEditSched({...editSched, frequency: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                             <option value="WEEKLY">Weekly</option>
                             <option value="MONTHLY">Monthly</option>
                             <option value="QUARTERLY">Quarterly</option>
@@ -315,12 +316,12 @@ export default function MaintenanceSchedules() {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Next Due Date</label>
-                          <input type="date" required value={editSched.nextDueDate ? editSched.nextDueDate.split('T')[0] : ""} onChange={e => setEditSched({...editSched, nextDueDate: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="date" required value={editSched.nextDueDate ? editSched.nextDueDate.split('T')[0] : ""} onChange={e => setEditSched({...editSched, nextDueDate: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Status</label>
-                        <select value={editSched.status} onChange={e => setEditSched({...editSched, status: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <select value={editSched.status} onChange={e => setEditSched({...editSched, status: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                           <option value="ACTIVE">Active</option>
                           <option value="PAUSED">Paused</option>
                         </select>
@@ -329,7 +330,7 @@ export default function MaintenanceSchedules() {
                         <button type="submit" disabled={updateMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                         </button>
-                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>

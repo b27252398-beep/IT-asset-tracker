@@ -24,6 +24,7 @@ const itemVariants = {
 };
 
 export default function Consumables() {
+  const [searchTerm, setSearchTerm] = useState('');
   const queryClient = useQueryClient();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -109,8 +110,8 @@ export default function Consumables() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input 
               type="text" 
-              placeholder="Search items..." 
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+              placeholder="Search items..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} 
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
           <button 
@@ -126,7 +127,7 @@ export default function Consumables() {
       <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
-            <thead className="bg-slate-50/50 dark:bg-slate-900/50">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-900/50">
               <tr>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Item Name</th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Category</th>
@@ -137,13 +138,13 @@ export default function Consumables() {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-700">
-              {consumables.map((item: any) => {
+              {consumables.filter((searchItem: any) => Object.values(searchItem || {}).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()))).map((item: any) => {
                 const isLowStock = item.quantity <= item.reorderPoint;
 
                 return (
                   <motion.tr 
                     key={item.id} 
-                    className="hover:bg-slate-50/50 dark:bg-slate-900/50 transition-colors"
+                    className="hover:bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-900/50 transition-colors"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
@@ -228,11 +229,11 @@ export default function Consumables() {
                     <form onSubmit={handleAddSubmit} className="mt-6 space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Item Name</label>
-                        <input type="text" required value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Logitech Wireless Mouse" />
+                        <input type="text" required value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="e.g. Logitech Wireless Mouse" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Category</label>
-                        <select value={newItem.category} onChange={e => setNewItem({...newItem, category: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <select value={newItem.category} onChange={e => setNewItem({...newItem, category: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                           <option value="Accessories">Accessories (Mouse, Keyboard)</option>
                           <option value="Cables">Cables & Adapters</option>
                           <option value="Office Supplies">Office Supplies (Ink, Paper)</option>
@@ -242,22 +243,22 @@ export default function Consumables() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Initial Quantity</label>
-                          <input type="number" min="0" required value={newItem.quantity} onChange={e => setNewItem({...newItem, quantity: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="number" min="0" required value={newItem.quantity} onChange={e => setNewItem({...newItem, quantity: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Reorder Point</label>
-                          <input type="number" min="0" required value={newItem.reorderPoint} onChange={e => setNewItem({...newItem, reorderPoint: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="number" min="0" required value={newItem.reorderPoint} onChange={e => setNewItem({...newItem, reorderPoint: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Unit Cost ($)</label>
-                        <input type="number" step="0.01" min="0" value={newItem.cost} onChange={e => setNewItem({...newItem, cost: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. 29.99" />
+                        <input type="number" step="0.01" min="0" value={newItem.cost} onChange={e => setNewItem({...newItem, cost: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="e.g. 29.99" />
                       </div>
                       <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-700">
                         <button type="submit" disabled={createMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {createMutation.isPending ? 'Saving...' : 'Add Item'}
                         </button>
-                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsAddModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>
@@ -287,11 +288,11 @@ export default function Consumables() {
                     <form onSubmit={handleEditSubmit} className="mt-6 space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Item Name</label>
-                        <input type="text" required value={editItem.name} onChange={e => setEditItem({...editItem, name: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                        <input type="text" required value={editItem.name} onChange={e => setEditItem({...editItem, name: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Category</label>
-                        <select value={editItem.category} onChange={e => setEditItem({...editItem, category: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <select value={editItem.category} onChange={e => setEditItem({...editItem, category: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                           <option value="Accessories">Accessories (Mouse, Keyboard)</option>
                           <option value="Cables">Cables & Adapters</option>
                           <option value="Office Supplies">Office Supplies (Ink, Paper)</option>
@@ -301,22 +302,22 @@ export default function Consumables() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Quantity Available</label>
-                          <input type="number" min="0" required value={editItem.quantity} onChange={e => setEditItem({...editItem, quantity: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="number" min="0" required value={editItem.quantity} onChange={e => setEditItem({...editItem, quantity: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Reorder Point</label>
-                          <input type="number" min="0" required value={editItem.reorderPoint} onChange={e => setEditItem({...editItem, reorderPoint: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                          <input type="number" min="0" required value={editItem.reorderPoint} onChange={e => setEditItem({...editItem, reorderPoint: parseInt(e.target.value)})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                         </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">Unit Cost ($)</label>
-                        <input type="number" step="0.01" min="0" value={editItem.cost === null ? "" : editItem.cost} onChange={e => setEditItem({...editItem, cost: e.target.value})} className="mt-1 block w-full border border-slate-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                        <input type="number" step="0.01" min="0" value={editItem.cost === null ? "" : editItem.cost} onChange={e => setEditItem({...editItem, cost: e.target.value})} className="mt-1 block w-full border border-slate-300 dark:border-slate-600 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                       </div>
                       <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse -mx-6 -mb-6 mt-6 border-t border-slate-100 dark:border-slate-700">
                         <button type="submit" disabled={updateMutation.isPending} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm cursor-pointer disabled:opacity-50">
                           {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                         </button>
-                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
+                        <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-900 text-base font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm cursor-pointer">
                           Cancel
                         </button>
                       </div>

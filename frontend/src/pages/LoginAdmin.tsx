@@ -22,7 +22,7 @@ export default function LoginAdmin() {
     try {
       const res = await axios.post(`${BASE_URL}/auth/login`, { username, password });
       const { token, user } = res.data.data;
-      login(token, user);
+      login(token, { ...user, role: 'ADMIN' });
       navigate('/');
     } catch {
       setError('Invalid credentials. Try: admin / admin123');
@@ -104,7 +104,7 @@ export default function LoginAdmin() {
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input type="text" required value={username} onChange={e => setUsername(e.target.value)}
                     placeholder="admin"
-                    className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-slate-50 dark:bg-slate-900/50" />
+                    className="w-full pl-10 pr-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white" />
                 </div>
               </div>
 
@@ -114,7 +114,7 @@ export default function LoginAdmin() {
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input type={showPass ? 'text' : 'password'} required value={password} onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-slate-50 dark:bg-slate-900/50" />
+                    className="w-full pl-10 pr-10 py-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white" />
                   <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-300">
                     {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>

@@ -121,7 +121,7 @@ export default function AuditLogs() {
               placeholder="Search user, entity, details..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             />
           </div>
           <div className="relative">
@@ -129,7 +129,7 @@ export default function AuditLogs() {
             <select
               value={filterAction}
               onChange={(e) => setFilterAction(e.target.value)}
-              className="pl-9 pr-8 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none bg-white dark:bg-slate-900"
+              className="pl-9 pr-8 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
             >
               <option value="ALL">All Actions</option>
               <option value="CREATE">Creates</option>
@@ -152,7 +152,7 @@ export default function AuditLogs() {
       <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
-            <thead className="bg-slate-50/50 dark:bg-slate-900/50">
+            <thead className="bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-900/50">
               <tr>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Timestamp</th>
                 <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Action</th>
@@ -165,7 +165,7 @@ export default function AuditLogs() {
               {filteredLogs.map((log: any) => (
                 <motion.tr 
                   key={log.id} 
-                  className="hover:bg-slate-50/50 dark:bg-slate-900/50 transition-colors"
+                  className="hover:bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-900/50 transition-colors"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >

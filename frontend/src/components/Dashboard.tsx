@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "../store/authStore";
 import { fetchDashboardMetrics, fetchAssets, fetchWarrantyAlerts, downloadAssetsCSV } from "../api/assetApi";
-import { Monitor, CheckCircle, Wrench, XCircle, ArrowUpRight, ShieldCheck, Laptop2, Server, AlertTriangle, FileText } from "lucide-react";
+import { Monitor, CheckCircle, Wrench, XCircle, ArrowUpRight, ShieldCheck, Laptop2, Server, AlertTriangle, FileText, LifeBuoy, QrCode } from "lucide-react";
 import { motion } from "framer-motion";
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -69,6 +69,57 @@ export default function Dashboard() {
   const activityData = metrics?.activityData || [];
   const categoryData = metrics?.categoryData || [];
 
+  if (userRole === 'EMPLOYEE') {
+    return (
+      <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Staff Portal</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Welcome to your personalized IT portal. Submit tickets and track your asset requests.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <motion.div variants={itemVariants} className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-500/30 p-8 rounded-2xl">
+            <LifeBuoy className="w-10 h-10 text-indigo-600 dark:text-indigo-400 mb-4" />
+            <h2 className="text-xl font-bold text-indigo-900 dark:text-indigo-100 mb-2">Helpdesk Support</h2>
+            <p className="text-indigo-700/80 dark:text-indigo-300 mb-6">Raise a new issue ticket for broken hardware or missing software access.</p>
+            <button onClick={() => navigate('/issues')} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow-sm transition-colors cursor-pointer">Submit Ticket</button>
+          </motion.div>
+          <motion.div variants={itemVariants} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-500/30 p-8 rounded-2xl">
+            <QrCode className="w-10 h-10 text-blue-600 dark:text-blue-400 mb-4" />
+            <h2 className="text-xl font-bold text-blue-900 dark:text-blue-100 mb-2">Asset Scanner</h2>
+            <p className="text-blue-700/80 dark:text-blue-300 mb-6">Quickly scan a QR code to view asset details or submit a specific ticket.</p>
+            <button onClick={() => navigate('/scanner')} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm transition-colors cursor-pointer">Scan QR Code</button>
+          </motion.div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (userRole === 'TECH_TEAM') {
+    return (
+      <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Tech Team Portal</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your assigned repair queues and active incidents.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <motion.div variants={itemVariants} className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-500/30 p-8 rounded-2xl">
+            <Wrench className="w-10 h-10 text-emerald-600 dark:text-emerald-400 mb-4" />
+            <h2 className="text-xl font-bold text-emerald-900 dark:text-emerald-100 mb-2">Assigned Tickets</h2>
+            <p className="text-emerald-700/80 dark:text-emerald-300 mb-6">View the helpdesk queue to resolve tickets assigned to your technician profile.</p>
+            <button onClick={() => navigate('/issues')} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-sm transition-colors cursor-pointer">View My Queue</button>
+          </motion.div>
+          <motion.div variants={itemVariants} className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-8 rounded-2xl">
+            <Monitor className="w-10 h-10 text-slate-600 dark:text-slate-400 mb-4" />
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Asset Maintenance</h2>
+            <p className="text-slate-600 dark:text-slate-400 mb-6">Look up hardware serial numbers and update provisioning statuses.</p>
+            <button onClick={() => navigate('/assets')} className="px-5 py-2.5 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 text-white rounded-lg font-medium shadow-sm transition-colors cursor-pointer">Browse Assets</button>
+          </motion.div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Admin View (Combined/Overview)
   return (
     <motion.div 
       id="dashboard-content"
@@ -81,7 +132,7 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Overview</h1>
-          <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm mt-1">Real-time metrics and asset utilization across your organization.</p>
+          <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 text-sm mt-1">Real-time metrics and asset utilization across your organization.</p>
         </div>
         {userRole !== 'EMPLOYEE' && (
           <div className="flex gap-3 w-full sm:w-auto">
@@ -119,7 +170,7 @@ export default function Dashboard() {
           >
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm font-medium">{stat.title}</p>
+                <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 text-sm font-medium">{stat.title}</p>
                 <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mt-2">{stat.value}</h3>
               </div>
               <div className={`${stat.bg} ${stat.color} p-3 rounded-xl`}>
@@ -131,7 +182,7 @@ export default function Dashboard() {
                 <ArrowUpRight className="w-4 h-4 mr-1" />
                 12%
               </span>
-              <span className="text-slate-400 dark:text-slate-500 ml-2">vs last month</span>
+              <span className="text-slate-400 dark:text-slate-500 dark:text-slate-400 ml-2">vs last month</span>
             </div>
             
             {/* Decorative gradient blur */}
@@ -147,12 +198,12 @@ export default function Dashboard() {
           <div className="flex justify-between items-center mb-6">
             <div>
               <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Provisioning Activity</h3>
-              <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm">Assignments vs Returns this week</p>
+              <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 text-sm">Assignments vs Returns this week</p>
             </div>
           </div>
           <div className="h-72 w-full">
             {activityData.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500 italic">No activity data available</div>
+              <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500 dark:text-slate-400 italic">No activity data available</div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={activityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -185,11 +236,11 @@ export default function Dashboard() {
         <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col">
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Hardware Distribution</h3>
-            <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm">Assets by category</p>
+            <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 text-sm">Assets by category</p>
           </div>
           <div className="flex-1 min-h-[200px]">
             {categoryData.length === 0 ? (
-               <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500 italic mt-8">No assets in inventory</div>
+               <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500 dark:text-slate-400 italic mt-8">No assets in inventory</div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -240,13 +291,13 @@ export default function Dashboard() {
 
         <div className="space-y-4">
           {alerts.expired.length === 0 && alerts.expiringSoon.length === 0 ? (
-            <div className="text-center py-8 text-slate-500 dark:text-slate-400 dark:text-slate-500 italic">No warranty alerts at this time.</div>
+            <div className="text-center py-8 text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 italic">No warranty alerts at this time.</div>
           ) : (
             <>
               {alerts.expired.map((asset: any) => (
                 <div key={asset.id} className="flex items-center justify-between p-4 rounded-xl border border-red-100 dark:border-red-500/30 bg-red-50/30 dark:bg-red-500/10">
                   <div>
-                    <h4 className="font-semibold text-slate-800 dark:text-slate-100">{asset.name} <span className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 font-normal ml-2">({asset.assetTag})</span></h4>
+                    <h4 className="font-semibold text-slate-800 dark:text-slate-100">{asset.name} <span className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 font-normal ml-2">({asset.assetTag})</span></h4>
                     <p className="text-sm text-red-600 dark:text-red-400 mt-1">Warranty expired on {new Date(asset.warrantyExpiry).toLocaleDateString()}</p>
                   </div>
                   {userRole !== 'EMPLOYEE' && (
@@ -260,7 +311,7 @@ export default function Dashboard() {
                 return (
                   <div key={asset.id} className="flex items-center justify-between p-4 rounded-xl border border-amber-100 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 dark:bg-amber-500/20/30">
                     <div>
-                      <h4 className="font-semibold text-slate-800 dark:text-slate-100">{asset.name} <span className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 font-normal ml-2">({asset.assetTag})</span></h4>
+                      <h4 className="font-semibold text-slate-800 dark:text-slate-100">{asset.name} <span className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400 font-normal ml-2">({asset.assetTag})</span></h4>
                       <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">Expires in {daysLeft} days ({new Date(asset.warrantyExpiry).toLocaleDateString()})</p>
                     </div>
                     {userRole !== 'EMPLOYEE' && (
@@ -276,7 +327,7 @@ export default function Dashboard() {
 
       {/* Recent Assets Table */}
       <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
-        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50/50 dark:bg-slate-900/50">
           <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Recent Inventory</h3>
           {userRole !== 'EMPLOYEE' && (
             <button onClick={() => navigate('/assets')} className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:text-indigo-400 cursor-pointer">View All</button>
@@ -285,7 +336,7 @@ export default function Dashboard() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 text-xs uppercase tracking-wider border-b border-slate-100 dark:border-slate-700">
+              <tr className="bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider border-b border-slate-100 dark:border-slate-700">
                 <th className="px-6 py-4 font-medium">Asset Tag</th>
                 <th className="px-6 py-4 font-medium">Model</th>
                 <th className="px-6 py-4 font-medium">Category</th>
@@ -298,7 +349,7 @@ export default function Dashboard() {
                 <tr key={asset.id} className="hover:bg-slate-50 dark:bg-slate-900/50 dark:bg-slate-700/50 transition-colors group">
                   <td className="px-6 py-4 font-medium text-slate-700 dark:text-slate-200">
                     <div className="flex items-center">
-                      <ShieldCheck className="w-4 h-4 mr-2 text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 transition-colors" />
+                      <ShieldCheck className="w-4 h-4 mr-2 text-slate-400 dark:text-slate-500 dark:text-slate-400 group-hover:text-indigo-500 transition-colors" />
                       {asset.assetTag}
                     </div>
                   </td>
@@ -325,7 +376,7 @@ export default function Dashboard() {
                       {asset.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 dark:text-slate-500">
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400">
                     {asset.currentUser ? (
                       <div className="flex items-center">
                         <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs font-bold mr-2">
@@ -334,14 +385,14 @@ export default function Dashboard() {
                         {asset.currentUser}
                       </div>
                     ) : (
-                      <span className="text-slate-400 dark:text-slate-500 italic">Unassigned</span>
+                      <span className="text-slate-400 dark:text-slate-500 dark:text-slate-400 italic">Unassigned</span>
                     )}
                   </td>
                 </tr>
               ))}
               {(!recentAssets || recentAssets.length === 0) && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-slate-500 dark:text-slate-400 dark:text-slate-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-slate-500 dark:text-slate-400 dark:text-slate-500 dark:text-slate-400">
                     No assets found in inventory.
                   </td>
                 </tr>

@@ -74,7 +74,7 @@ export default function Login() {
                 <input
                   type="text"
                   required
-                  className="appearance-none block w-full pl-10 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="appearance-none block w-full pl-10 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                   placeholder="admin"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -91,7 +91,7 @@ export default function Login() {
                 <input
                   type="password"
                   required
-                  className="appearance-none block w-full pl-10 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="appearance-none block w-full pl-10 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -106,7 +106,7 @@ export default function Login() {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 border-slate-300 rounded"
+                className="h-4 w-4 text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700 dark:text-slate-200">
                 Remember me
@@ -124,7 +124,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md shadow-indigo-200 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md shadow-indigo-200 transition-colors disabled:opacity-70 disabled:cursor-not-allowed bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
